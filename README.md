@@ -1,2 +1,2 @@
-# AutoAbstraction
+# pylogabstract
 Automatic event log abstraction.
