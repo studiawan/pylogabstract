@@ -16,7 +16,11 @@ setup(name='pylogabstract',
       license='MIT',
       packages=['pylogabstract'],
       install_requires=[
-          'tensorflow'
+          'tensorflow',
+          'networkx',
+          'python-louvain',
+          'nltk',
+          'datefinder'
       ],
       include_package_data=True,
       zip_safe=False)
