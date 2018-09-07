@@ -15,6 +15,11 @@ setup(name='pylogabstract',
       author_email='studiawan@gmail.com',
       license='MIT',
       packages=['pylogabstract'],
+      entry_points={
+          'console_scripts': [
+              'pylogabstract = pylogabstract.pylogabstract:main'
+          ],
+      },
       install_requires=[
           'tensorflow',
           'networkx',
