@@ -8,7 +8,8 @@ class Parser(object):
         self.log_file = log_file
         self.model = None
         self.config = None
-        self.master_label = None
+        self.master_label = {}
+        self.parsed_logs = OrderedDict()
 
     def __load_pretrained_model(self):
         # create instance of config
@@ -59,16 +60,19 @@ class Parser(object):
         self.__load_pretrained_model()
         self.master_label = self.__load_label()
         with open(self.log_file) as f:
-            for line in f:
+            for line_index, line in enumerate(f):
                 words_raw = line.strip().split(' ')
                 ner_label = self.model.predict(words_raw)
 
-                yield self.__get_per_entity(words_raw, ner_label)
+                parsed = self.__get_per_entity(words_raw, ner_label)
+                self.parsed_logs[line_index] = parsed
+
+        return self.parsed_logs
 
 
 if __name__ == "__main__":
     logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/auth.log'
     parser = Parser(logfile)
     result = parser.parse_logs()
-    for r in result:
-        print(r)
+    for line_id, parsed_entry in result.items():
+        print(line_id, parsed_entry)

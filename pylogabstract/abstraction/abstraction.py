@@ -369,10 +369,16 @@ class AutoAbstraction(object):
 
         return self.final_abstractions
 
+    def write_abstraction(self, output_file):
+        f = open(output_file, 'w')
+        for index, abstraction in self.final_abstractions.items():
+            f.write(str(index) + ' ' + abstraction['abstraction'] + '\n')
+        f.close()
+
 
 if __name__ == '__main__':
-    log_file = '/home/hudan/Git/prlogparser/datasets/casper-rw/auth.log'
-    aa = AutoAbstraction(log_file)
+    input_file = '/home/hudan/Git/prlogparser/datasets/casper-rw/auth.log'
+    aa = AutoAbstraction(input_file)
     abstractions = aa.get_abstraction()
 
     for a, b in abstractions.items():

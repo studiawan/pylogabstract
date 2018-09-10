@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 pylogabstract/parser/data/*
 pylogabstract/parser/results/*
+results

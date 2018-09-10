@@ -91,11 +91,19 @@ class ParallelCosineSimilarity(object):
 
     def __get_cosine_similarity(self, unique_event_id):
         # calculate cosine similarity
-        string1 = self.event_attributes[unique_event_id[0]]['preprocessed_events_graphedge']
-        string2 = self.event_attributes[unique_event_id[1]]['preprocessed_events_graphedge']
-        distance = self.cosine_similarity.get_cosine_similarity(string1, string2)
-        if distance > 0.:
-            return round(distance, 3)
+        # only if message lengths are the same
+        string1_len = self.event_attributes[unique_event_id[0]]['message_length']
+        string2_len = self.event_attributes[unique_event_id[1]]['message_length']
+
+        if string1_len == string2_len:
+            string1 = self.event_attributes[unique_event_id[0]]['message']
+            string2 = self.event_attributes[unique_event_id[1]]['message']
+            distance = self.cosine_similarity.get_cosine_similarity(string1, string2)
+
+            if distance > 0.:
+                if distance < 0.1:
+                    distance = 0.001
+                return round(distance, 3)
 
     def __call__(self, unique_event_id):
         # get distance from two strings
@@ -124,5 +132,7 @@ class ParallelCosineSimilarity(object):
                 removed.append(index)
 
         distances = [y for x, y in enumerate(distances) if x not in removed]
+        for d in distances:
+            print(d)
         self.edges_weight = distances
         return distances

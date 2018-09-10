@@ -56,7 +56,8 @@ class Config():
 
 
     # general config
-    dir_output = "results/test/"
+    file_path = os.path.dirname(os.path.realpath(__file__))
+    dir_output = os.path.join(file_path, '..', "results/test/")
     dir_model  = dir_output + "model.weights/"
     path_log   = dir_output + "log.txt"
 
@@ -67,7 +68,7 @@ class Config():
     # glove files
     filename_glove = "data/glove.6B/glove.6B.{}d.txt".format(dim_word)
     # trimmed embeddings (created from glove_filename with build_data.py)
-    filename_trimmed = "data/glove.6B.{}d.trimmed.npz".format(dim_word)
+    filename_trimmed = os.path.join(file_path, '..', "data/glove.6B.{}d.trimmed.npz".format(dim_word))
     use_pretrained = True
 
     # dataset
@@ -80,9 +81,9 @@ class Config():
     max_iter = None # if not None, max number of examples in Dataset
 
     # vocab (created from dataset with build_data.py)
-    filename_words = "data/words.txt"
-    filename_tags = "data/tags.txt"
-    filename_chars = "data/chars.txt"
+    filename_words = os.path.join(file_path, '..', "data/words.txt")
+    filename_tags = os.path.join(file_path, '..', "data/tags.txt")
+    filename_chars = os.path.join(file_path, '..', "data/chars.txt")
 
     # training
     train_embeddings = False
@@ -102,3 +103,5 @@ class Config():
     # NOTE: if both chars and crf, only 1.6x slower on GPU
     use_crf = False # if crf, training is 1.7x slower on CPU
     use_chars = True # if char embedding, training is 3.5x slower on CPU
+
+    label_file = os.path.join(file_path, '..', "data/label.txt")
