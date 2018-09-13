@@ -1,7 +1,6 @@
-import networkx as nx
-import os
 from pylogabstract.preprocess.create_graph2 import CreateGraph
-from pylogabstract.clustering.louvain import Louvain
+from networkx.algorithms import community
+from operator import itemgetter
 
 
 class Abstraction(object):
@@ -12,63 +11,76 @@ class Abstraction(object):
         self.clusters = {}
         self.cluster_id = 0
 
-    def __create_graph(self, cluster=None):
-        # create new temporary graph based on subgraph nodes
-        if cluster:
-            subgraph = [int(node) for node in cluster]
-            graph_noattributes = self.graph_noattributes.subgraph(subgraph)
-
+    def __create_graph(self):
         # create graph
-        else:
-            self.graph_model = CreateGraph(self.log_file)
-            self.graph = self.graph_model.create_graph()
-            self.graph_noattributes = self.graph_model.create_graph_noattributes()
-            graph_noattributes = self.graph_noattributes
+        self.graph_model = CreateGraph(self.log_file)
+        self.graph = self.graph_model.create_graph()
+        self.graph_noattributes = self.graph_model.create_graph_noattributes()
+        self.messages = {}
 
-        # write to gexf file
-        filename = self.log_file.split('/')[-1]
-        gexf_file = os.path.join('/', 'tmp', filename + '.gexf')
-        nx.write_gexf(graph_noattributes, gexf_file)
-
-        return gexf_file
-
-    def __get_community(self, subgraph=None, previous_cluster=None):
-        # prepare graph or subgraph
-        if subgraph:
-            print('subgraph', subgraph)
-            gexf_file = self.__create_graph(subgraph)
-        else:
-            gexf_file = self.__create_graph()
-
-        # graph clustering based on Louvain community detection
-        louvain = Louvain(gexf_file)
-        clusters = louvain.get_cluster()
-
-        # stop-recursion case: if there is no more partition
-        if list(clusters.values())[0] == previous_cluster:
-            # print('stop recursion', clusters)
-            nodes = [int(node) for node in list(clusters.values())[0]]
-            self.clusters[self.cluster_id] = nodes
+    def __get_clusters(self):
+        self.__create_graph()
+        comp = community.girvan_newman(self.graph, most_valuable_edge=lightest)
+        for c in next(comp):
+            self.clusters[self.cluster_id] = sorted(c)
             self.cluster_id += 1
-
-        # recursion case: graph clustering
-        else:
-            print('recursion', clusters)
-            for cluster_id, cluster in clusters.items():
-                previous_cluster = cluster
-                self.__get_community(cluster, previous_cluster)
 
         return self.clusters
 
+    def __get_messages(self):
+        for cluster_id, cluster in self.clusters.items():
+            cluster_messages = []
+            for c in cluster:
+                cluster_messages.append(self.graph.nodes[c]['message'])
+                print(c, self.graph.nodes[c]['message'], self.graph.nodes[c]['preprocessed_message'])
+            print('---')
+            self.messages[cluster_id] = cluster_messages
+
+        return self.messages
+
+    @staticmethod
+    def __get_asterisk(candidate):
+        # candidate: list of list
+        abstraction = ''
+
+        # transpose row to column
+        candidate_transpose = list(zip(*candidate))
+        candidate_length = len(candidate)
+
+        if candidate_length > 1:
+            # get abstraction
+            abstraction_list = []
+            for index, message in enumerate(candidate_transpose):
+                message_length = len(set(message))
+                if message_length == 1:
+                    abstraction_list.append(message[0])
+                else:
+                    abstraction_list.append('*')
+
+            abstraction = ' '.join(abstraction_list)
+
+        elif candidate_length == 1:
+            abstraction = ' '.join(candidate[0])
+
+        return abstraction
+
+    def __get_abstraction_asterisk(self):
+        pass
+
     def get_abstraction(self):
-        clusters = self.__get_community()
+        clusters = self.__get_clusters()
+        self.__get_messages()
         return clusters
 
 
+def lightest(g):
+    u, v, w = min(g.edges(data='weight'), key=itemgetter(2))
+    return u, v
+
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/auth.log'
+    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
     a = Abstraction(logfile)
     results = a.get_abstraction()
 
-    for k, v in results.items():
-        print(k, v)
+    # for k, val in results.items():
+    #     print(val)

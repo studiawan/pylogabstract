@@ -20,13 +20,13 @@ class Preprocess(object):
         self.__get_events()
 
         # get graph event_attributes
-        unique_events_only = {}
+        unique_events_only = []
         unique_event_id = 0
 
         # get unique events
         for line_id, parsed_log in self.parsed_logs.items():
-            if parsed_log['message'] not in unique_events_only.values():
-                unique_events_only[unique_event_id] = parsed_log['message']
+            if parsed_log['message'] not in unique_events_only:
+                unique_events_only.append(parsed_log['message'])
                 self.event_attributes[unique_event_id] = {'message': parsed_log['message'],
                                                           'message_length': len(parsed_log['message'].split(' ')),
                                                           'cluster': unique_event_id,
@@ -40,7 +40,6 @@ class Preprocess(object):
         # get unique events for networkx
         self.unique_events_length = unique_event_id
         for index, attr in self.event_attributes.items():
-            print(index, attr)
             self.unique_events.append((index, attr))
 
         return self.unique_events

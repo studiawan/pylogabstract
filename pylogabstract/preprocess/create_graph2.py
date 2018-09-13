@@ -9,6 +9,7 @@ class CreateGraph(object):
         self.preprocess = None
         self.unique_events = []
         self.unique_events_length = 0
+        self.event_attributes = {}
         self.distances = []
         self.graph = nx.MultiGraph()
         self.graph_noattributes = nx.Graph()

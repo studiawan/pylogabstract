@@ -27,9 +27,9 @@ class Parser(object):
 
         labels = {}
         for line in label:
-            line_split = line.split()
+            line_split = line.split(' ')
             ner_label, final_label = line_split[0], line_split[1]
-            labels[ner_label] = final_label
+            labels[ner_label] = final_label.rstrip()
 
         return labels
 
@@ -61,7 +61,7 @@ class Parser(object):
         self.master_label = self.__load_label()
         with open(self.log_file) as f:
             for line_index, line in enumerate(f):
-                words_raw = line.strip().split(' ')
+                words_raw = line.strip().split()
                 ner_label = self.model.predict(words_raw)
 
                 parsed = self.__get_per_entity(words_raw, ner_label)
@@ -71,8 +71,8 @@ class Parser(object):
 
 
 if __name__ == "__main__":
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/auth.log'
+    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
     parser = Parser(logfile)
     result = parser.parse_logs()
-    for line_id, parsed_entry in result.items():
-        print(line_id, parsed_entry)
+    # for line_id, parsed_entry in result.items():
+    #     print(line_id, parsed_entry)
