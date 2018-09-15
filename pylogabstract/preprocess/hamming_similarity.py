@@ -37,10 +37,10 @@ class HammingSimilarity(object):
         return round(weighted_hamming / sum(index), 3)
 
 
-class ParallelHammingDistance(object):
-    def __init__(self, event_attributes, event_length):
+class ParallelHammingSimilarity(object):
+    def __init__(self, event_attributes, event_indices):
         self.event_attributes = event_attributes
-        self.event_length = event_length
+        self.event_indices = event_indices
         self.hamming_similarity = HammingSimilarity()
         self.edges_weight = []
 
@@ -66,7 +66,7 @@ class ParallelHammingDistance(object):
 
     def get_parallel_hamming_similarity(self):
         # get unique event id combination
-        event_id_combination = list(combinations(range(self.event_length), 2))
+        event_id_combination = combinations(self.event_indices, 2)
 
         # get distance with multiprocessing
         total_cpu = multiprocessing.cpu_count()
@@ -78,7 +78,7 @@ class ParallelHammingDistance(object):
         # remove empty elements
         removed = []
         for index, distance in enumerate(similarity):
-            if distance[2] is None:
+            if (distance[2] is None) or (distance[2] == 0):
                 removed.append(index)
 
         # similarity as edge weight in a graph

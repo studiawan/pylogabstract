@@ -18,7 +18,7 @@ class CreateGraph(object):
         # preprocess logs and get unique events as nodes in a graph
         self.preprocess = Preprocess(self.log_file)
         self.unique_events = self.preprocess.get_unique_events()
-        self.unique_events_length = self.preprocess.unique_events_length
+        self.unique_events_length = self.preprocess.partial_unique_events_length
         self.event_attributes = self.preprocess.event_attributes
 
     def __get_distances(self):
