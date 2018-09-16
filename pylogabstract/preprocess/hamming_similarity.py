@@ -85,7 +85,4 @@ class ParallelHammingSimilarity(object):
         similarity = [y for x, y in enumerate(similarity) if x not in removed]
         self.edges_weight = similarity
 
-        for d in similarity:
-            print(d)
-
         return similarity
