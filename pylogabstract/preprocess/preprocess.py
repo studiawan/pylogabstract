@@ -48,7 +48,4 @@ class Preprocess(object):
             if index in indices:
                 partial_unique_events.append((index, attr))
 
-        # get length of unique events for networkx
-        partial_unique_events_length = len(indices)
-
-        return partial_unique_events, partial_unique_events_length
+        return partial_unique_events
