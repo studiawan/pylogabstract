@@ -53,6 +53,9 @@ class Parser(object):
             final_label = self.master_label[main_label]
             final_entity[final_label] = ' '.join(words)
 
+        if 'message' not in final_entity.keys():
+            final_entity['message'] = ''
+
         return final_entity
 
     def parse_logs(self):
