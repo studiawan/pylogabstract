@@ -34,7 +34,12 @@ class HammingSimilarity(object):
             weighted_hamming += index[i] * isdifferent
             i += 1
 
-        return round(weighted_hamming / sum(index), 3)
+        try:
+            weighted_hamming = round(weighted_hamming / sum(index), 3)
+        except ZeroDivisionError:
+            weighted_hamming = 0
+
+        return weighted_hamming
 
 
 class ParallelHammingSimilarity(object):
@@ -78,7 +83,7 @@ class ParallelHammingSimilarity(object):
         # remove empty elements
         removed = []
         for index, distance in enumerate(similarity):
-            if (distance[2] is None) or (distance[2] == 0):
+            if distance[2] is None:
                 removed.append(index)
 
         # similarity as edge weight in a graph
