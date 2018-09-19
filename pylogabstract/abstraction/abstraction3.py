@@ -71,7 +71,23 @@ class LogAbstraction(object):
                 self.cluster_id += 1
                 return None
             else:
-                return graph
+                components = nx.connected_components(graph)
+                removed_nodes = []
+                for component in components:
+                    # if a component only has two vertices with one edge
+                    if len(component) == 2:
+                        component_node = list(component)
+                        if graph.has_edge(component_node[0], component_node[1]) or \
+                                graph.has_edge(component_node[1], component_node[0]):
+                            self.clusters[self.cluster_id].extend(list(component))
+                            self.cluster_id += 1
+                            removed_nodes.extend(component_node)
+
+                graph.remove_nodes_from(removed_nodes)
+                if graph.nodes():
+                    return graph
+                else:
+                    return None
         else:
             return None
 
@@ -146,7 +162,7 @@ def lightest(g):
 
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/kern.log'
+    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
     log_abstraction = LogAbstraction(logfile)
     results = log_abstraction.get_abstraction()
     event_attr = log_abstraction.event_attributes
