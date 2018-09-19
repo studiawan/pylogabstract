@@ -8,7 +8,7 @@ class CreateGraph(object):
         self.event_attributes = event_attributes
         self.event_indices = event_indices
         self.similarity = []
-        self.graph = nx.MultiGraph()
+        self.graph = nx.Graph()
 
     def __get_similarity(self):
         hamming_similarity = ParallelHammingSimilarity(self.event_attributes, self.event_indices)
