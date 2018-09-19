@@ -14,6 +14,7 @@ class LogAbstraction(object):
         self.cluster_id = 0
         self.message_length_group = {}
         self.event_attributes = {}
+        self.preprocess = None
 
     @staticmethod
     def __convert_to_nodeid_clusterid(partition):
@@ -103,7 +104,8 @@ class LogAbstraction(object):
         # the initial max modularity is the modularity of the initial graph before clustering
         # the initial cluster configuration is the graph's connected component
         # best_cluster, max_modularity = self.__get_initial_modularity(graph)
-        best_cluster, max_modularity = [], -1.
+        max_modularity = -1.
+        best_cluster = []
 
         # clustering using Girvan-Newman method
         clusters = community.girvan_newman(graph, most_valuable_edge=lightest)
@@ -122,10 +124,10 @@ class LogAbstraction(object):
 
     def __get_clusters(self):
         # preprocess
-        preprocess = Preprocess(self.log_file)
-        preprocess.get_unique_events()
-        self.message_length_group = preprocess.message_length_group
-        self.event_attributes = preprocess.event_attributes
+        self.preprocess = Preprocess(self.log_file)
+        self.preprocess.get_unique_events()
+        self.message_length_group = self.preprocess.message_length_group
+        self.event_attributes = self.preprocess.event_attributes
 
         for message_length, group in self.message_length_group.items():
             print(message_length, group)
@@ -137,7 +139,7 @@ class LogAbstraction(object):
 
             # create graph for a particular group
             else:
-                unique_events = preprocess.get_partial_unique_events(group)
+                unique_events = self.preprocess.get_partial_unique_events(group)
                 graph_model = CreateGraph(unique_events, self.event_attributes, group)
                 graph = graph_model.create_graph()
 
@@ -151,8 +153,33 @@ class LogAbstraction(object):
                         self.clusters[self.cluster_id].extend(nodes)
                         self.cluster_id += 1
 
+    def __refine_cluster(self):
+        removed_cluster = []
+        new_clusters = []
+        for cluster_id, cluster in self.clusters.items():
+            if len(cluster) > 5:
+                removed_cluster.append(cluster_id)
+                unique_events = self.preprocess.get_partial_unique_events(cluster)
+                graph_model = CreateGraph(unique_events, self.event_attributes, cluster)
+                graph = graph_model.create_graph()
+
+                # graph = self.__get_valid_graph(graph)
+                clusters = self.__get_graph_cluster(graph)
+                new_clusters.append(clusters)
+
+        for new_cluster in new_clusters:
+            for cluster_id, cluster in new_cluster.items():
+                self.clusters[self.cluster_id].extend(cluster)
+                self.cluster_id += 1
+
+        # empty/remove the current cluster
+        # self.clusters.pop(cluster_id, None)
+        for cluster_id in removed_cluster:
+            self.clusters[cluster_id] = list()
+
     def get_abstraction(self):
         self.__get_clusters()
+        self.__refine_cluster()
         return self.clusters
 
 
