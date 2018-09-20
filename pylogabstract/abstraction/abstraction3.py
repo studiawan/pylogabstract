@@ -157,7 +157,7 @@ class LogAbstraction(object):
         removed_cluster = []
         new_clusters = []
         for cluster_id, cluster in self.clusters.items():
-            if len(cluster) > 5:
+            if len(cluster) > 3:
                 removed_cluster.append(cluster_id)
                 unique_events = self.preprocess.get_partial_unique_events(cluster)
                 graph_model = CreateGraph(unique_events, self.event_attributes, cluster)
@@ -189,7 +189,7 @@ def lightest(g):
 
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
+    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/dmesg.3'
     log_abstraction = LogAbstraction(logfile)
     results = log_abstraction.get_abstraction()
     event_attr = log_abstraction.event_attributes
