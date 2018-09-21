@@ -18,6 +18,7 @@ class LogAbstraction(object):
 
     @staticmethod
     def __convert_to_nodeid_clusterid(partition):
+        # output: {nodeid:clusterid, ...}
         part_dict = {}
         cluster_id = 0
         for p in partition:
@@ -29,6 +30,7 @@ class LogAbstraction(object):
 
     @staticmethod
     def __convert_to_clusterid_nodeid(partitions):
+        # output: {clusterid: [nodeid, ...], ...}
         cluster = defaultdict(list)
         cluster_id = 0
         for partition in partitions:
@@ -36,24 +38,6 @@ class LogAbstraction(object):
             cluster_id += 1
 
         return cluster
-
-    def __get_initial_modularity(self, graph):
-        clusters = {}
-        cluster_id = 0
-
-        # get initial clusters with connected component
-        components = nx.connected_components(graph)
-        final_components = []
-        for component in components:
-            final_components.append(component)
-            clusters[cluster_id] = list(component)
-            cluster_id += 1
-
-        # get initial modularity
-        partition = self.__convert_to_nodeid_clusterid(final_components)
-        modularity = commun.modularity(partition, graph)
-
-        return clusters, modularity
 
     def __get_valid_graph(self, graph):
         # remove nodes without edges
@@ -65,17 +49,20 @@ class LogAbstraction(object):
             self.cluster_id += 1
         graph.remove_nodes_from(isolated)
 
+        # if graph has edges
         if graph.edges():
             # if only one edge exist, no clustering
             if len(graph.edges()) == 1:
                 self.clusters[self.cluster_id].extend(graph.nodes())
                 self.cluster_id += 1
                 return None
+
             else:
+                # check each connected component in the graph
                 components = nx.connected_components(graph)
                 removed_nodes = []
                 for component in components:
-                    # if a component only has two vertices with one edge
+                    # remove nodes if a component only has two vertices with one edge
                     if len(component) == 2:
                         component_node = list(component)
                         if graph.has_edge(component_node[0], component_node[1]) or \
@@ -83,8 +70,9 @@ class LogAbstraction(object):
                             self.clusters[self.cluster_id].extend(list(component))
                             self.cluster_id += 1
                             removed_nodes.extend(component_node)
-
                 graph.remove_nodes_from(removed_nodes)
+
+                # if nodes still exists after removal
                 if graph.nodes():
                     return graph
                 else:
@@ -92,18 +80,8 @@ class LogAbstraction(object):
         else:
             return None
 
-    @staticmethod
-    def __get_edge_weight_sum(graph):
-        weight_sum = 0
-        for edges in graph.edges(data='weight'):
-            weight_sum += edges[2]
-
-        return weight_sum
-
     def __get_graph_cluster(self, graph):
-        # the initial max modularity is the modularity of the initial graph before clustering
-        # the initial cluster configuration is the graph's connected component
-        # best_cluster, max_modularity = self.__get_initial_modularity(graph)
+        # initialize maximum modularity and best cluster
         max_modularity = -1.
         best_cluster = []
 
@@ -129,9 +107,11 @@ class LogAbstraction(object):
         self.message_length_group = self.preprocess.message_length_group
         self.event_attributes = self.preprocess.event_attributes
 
+        # clustering per group of message length
         for message_length, group in self.message_length_group.items():
             print(message_length, group)
-            # no graph needed
+
+            # no graph needed as there is only one node
             group_length = len(group)
             if group_length == 1:
                 self.clusters[self.cluster_id].extend(group)
@@ -143,10 +123,8 @@ class LogAbstraction(object):
                 graph_model = CreateGraph(unique_events, self.event_attributes, group)
                 graph = graph_model.create_graph()
 
-                # only process connected components with edges > 1
-                graph = self.__get_valid_graph(graph)
-
                 # clustering with valid graph only
+                graph = self.__get_valid_graph(graph)
                 if graph is not None:
                     clusters = self.__get_graph_cluster(graph)
                     for index, nodes in clusters.items():
@@ -157,7 +135,7 @@ class LogAbstraction(object):
         removed_cluster = []
         new_clusters = []
         for cluster_id, cluster in self.clusters.items():
-            if len(cluster) > 3:
+            if len(cluster) >= 3:
                 removed_cluster.append(cluster_id)
                 unique_events = self.preprocess.get_partial_unique_events(cluster)
                 graph_model = CreateGraph(unique_events, self.event_attributes, cluster)
