@@ -35,12 +35,30 @@ class LogAbstraction(object):
         return abstraction
 
     @staticmethod
-    def __check_asterisk(abstractions):
+    def __check_total_asterisk(abstraction1, abstraction2, cluster_id1, cluster_id2):
+        total1 = 0
+        total2 = 0
+        for word1, word2 in zip(abstraction1, abstraction2):
+            if word1 == '*':
+                total1 += 1
+            if word2 == '*':
+                total2 += 1
+
+        if total1 < total2:
+            hasmore_asterisk = cluster_id1
+        else:
+            hasmore_asterisk = cluster_id2
+
+        return hasmore_asterisk
+
+    def __check_asterisk(self, abstractions):
         # check for abstraction that potentially can be merged with another abstraction
         # there is a flag check=True in self.clusters
         # the check is run in abstraction per message_length group
         # checked_abstraction = {cluster_id: abstraction, ...}
-        checked_abstraction = {}
+        checked_abstractions = {}
+        cluster_id = 0
+        checked_cluster_id = []
         for cluster_id1, cluster_id2 in combinations(abstractions.keys(), 2):
             if abstractions[cluster_id1]['check'] or abstractions[cluster_id2]['check']:
                 abstraction1 = abstractions[cluster_id1]['abstraction'].split()
@@ -53,6 +71,7 @@ class LogAbstraction(object):
                 sym_diff2 = sym_diff[centre_index:]
 
                 # check for merge
+                # once merge = False, it will not continue checking
                 merge = False
                 for word1, word2 in zip(sym_diff1, sym_diff2):
                     if word1 == word2:
@@ -63,13 +82,28 @@ class LogAbstraction(object):
                         merge = False
                         break
 
-                # merge
+                # merge abstractions
                 if merge:
-                    pass
-                else:
-                    pass
+                    parent_id = self.__check_total_asterisk(abstraction1, abstraction2, cluster_id1, cluster_id2)
+                    checked_abstractions[cluster_id] = {
+                        'abstraction': abstractions[parent_id]['abstraction'],
+                        'nodes': abstractions[cluster_id1]['nodes'] + abstractions[cluster_id2]['nodes']
+                    }
+                    checked_cluster_id.append(parent_id)
+                    cluster_id += 1
 
-        return checked_abstraction
+                # not merge
+                # check the combinations, which abstraction should be added in the final results: checked_abstractions
+                else:
+                    if cluster_id1 not in checked_cluster_id:
+                        checked_abstractions[cluster_id] = {
+                            'abstraction': abstractions[cluster_id1]['abstraction'],
+                            'nodes': abstractions[cluster_id1]['nodes']
+                        }
+                        checked_cluster_id.append(cluster_id1)
+                        cluster_id += 1
+
+        return checked_abstractions
 
     def __get_all_asterisk(self):
         # main loop to get asterisk
