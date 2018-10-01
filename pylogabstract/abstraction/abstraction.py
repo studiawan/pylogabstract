@@ -50,7 +50,7 @@ class LogAbstraction(object):
             if word2 == '*':
                 total2 += 1
 
-        if total1 < total2:
+        if total1 > total2:
             parent_id = cluster_id1
             child_id = cluster_id2
         else:
@@ -146,6 +146,77 @@ class LogAbstraction(object):
 
         return checked_abstractions
 
+    def __merge_abstraction(self, abstractions):
+        checked_abstractions = {}
+        cluster_id = 0
+        checked_cluster_id = []
+        checked_parent_id = []
+        valid_combinations = []
+        not_merge_id = []
+
+        # get abstraction that will not be checked (merged)
+        for original_cluster_id, abstraction in abstractions.items():
+            if abstraction['check'] is False:
+                checked_abstractions[cluster_id] = {
+                    'abstraction': abstractions[original_cluster_id]['abstraction'],
+                    'nodes': abstractions[original_cluster_id]['nodes']
+                }
+                checked_cluster_id.append(original_cluster_id)
+                cluster_id += 1
+
+        # get valid combinations
+        for cluster_id1, cluster_id2 in combinations(abstractions.keys(), 2):
+            if abstractions[cluster_id1]['check'] and abstractions[cluster_id2]['check']:
+                valid_combinations.append((cluster_id1, cluster_id2))
+
+        for cluster_id1, cluster_id2 in valid_combinations:
+            if (cluster_id1 not in checked_cluster_id) and (cluster_id2 not in checked_cluster_id):
+                hs = HammingSimilarity()
+                hamming_similarity = hs.get_weighted_hamming(abstractions[cluster_id1]['abstraction'],
+                                                             abstractions[cluster_id2]['abstraction'])
+                if hamming_similarity > 0.:
+                    abstraction1 = abstractions[cluster_id1]['abstraction'].split()
+                    abstraction2 = abstractions[cluster_id2]['abstraction'].split()
+
+                    # check for merge
+                    # once merge = False, it will not continue checking
+                    merge = False
+                    for word1, word2 in zip(abstraction1, abstraction2):
+                        if word1 == word2:
+                            merge = True
+                        elif (word1 != word2) and (word1 == '*' or word2 == '*'):
+                            merge = True
+                        elif (word1 != word2) and (word1 != '*') and (word2 != '*'):
+                            merge = False
+                            break
+
+                    # merge abstractions
+                    if merge:
+                        parent_id, child_id = self.__check_total_asterisk(abstraction1, abstraction2,
+                                                                          cluster_id1, cluster_id2)
+                        checked_abstractions[cluster_id] = {
+                            'abstraction': abstractions[parent_id]['abstraction'],
+                            'nodes': abstractions[cluster_id1]['nodes'] + abstractions[cluster_id2]['nodes']
+                        }
+                        checked_cluster_id.append(child_id)
+                        checked_parent_id.append(parent_id)
+                        cluster_id += 1
+
+                    else:
+                        not_merge_id.extend([cluster_id1, cluster_id2])
+
+        # for cluster id that not in checked_cluster_id and checked_parent_id
+        not_merge_id = set(not_merge_id)
+        for index in not_merge_id:
+            if (index not in checked_cluster_id) and (index not in checked_parent_id):
+                checked_abstractions[cluster_id] = {
+                    'abstraction': abstractions[index]['abstraction'],
+                    'nodes': abstractions[index]['nodes']
+                }
+                cluster_id += 1
+
+        return checked_abstractions
+
     def __get_all_asterisk(self):
         # main loop to get asterisk
         # abstractions[message_length] = {cluster_id: abstraction, ...}
@@ -162,8 +233,8 @@ class LogAbstraction(object):
                                            'nodes': cluster['nodes'],
                                            'check': cluster['check']}
 
-            checked_abstraction = self.__check_asterisk(abstraction)
-            abstractions[message_length] = checked_abstraction
+            # check merge-possible abstraction
+            abstractions[message_length] = self.__merge_abstraction(abstraction)
 
         return abstractions
 
