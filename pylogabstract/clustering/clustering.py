@@ -1,6 +1,6 @@
 import community as commun
 import networkx as nx
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from networkx.algorithms import community
 from operator import itemgetter
 from pylogabstract.preprocess.preprocess import Preprocess
@@ -15,6 +15,7 @@ class LogClustering(object):
         self.message_length_group = {}
         self.event_attributes = {}
         self.preprocess = None
+        self.parsed_logs = OrderedDict()
 
     @staticmethod
     def __convert_to_nodeid_clusterid(partition):
@@ -129,11 +130,12 @@ class LogClustering(object):
         self.preprocess.get_unique_events()
         self.message_length_group = self.preprocess.message_length_group
         self.event_attributes = self.preprocess.event_attributes
+        self.parsed_logs = self.preprocess.parsed_logs
 
         # clustering per group of message length
         # self.clusters[message_length] = {cluster_id: {'nodes': list, 'check': bool}, ...}
         for message_length, group in self.message_length_group.items():
-            print(message_length, group)
+            # print(message_length, group)
 
             # no graph needed as there is only one node
             group_length = len(group)
