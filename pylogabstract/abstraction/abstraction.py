@@ -156,27 +156,28 @@ class LogAbstraction(object):
         abstraction_id = 0
         for message_length, abstraction in abstractions.items():
             # get log ids per cluster
-            log_ids = []
             for cluster_id, cluster in abstraction.items():
+                log_ids = []
                 for node in cluster['nodes']:
                     log_ids.extend(self.event_attributes[node]['member'])
 
-            # get raw logs per cluster and then get asterisk
-            candidate = []
-            for log_id in log_ids:
-                parsed_logs = self.parsed_logs[log_id]
-                values = []
-                for label, value in parsed_logs.items():
-                    if label != 'message':
-                        values.extend(value.split())
-                candidate.append(values)
+                # get raw logs per cluster (except the main message)
+                candidate = []
+                for log_id in log_ids:
+                    parsed_logs = self.parsed_logs[log_id]
+                    values = []
+                    for label, value in parsed_logs.items():
+                        if label != 'message':
+                            values.extend(value.split())
+                    candidate.append(values)
 
-            abstraction = self.__get_asterisk(candidate)
-            self.abstractions[abstraction_id] = {
-                'abstraction': abstraction,
-                'log_id': log_ids
-            }
-            abstraction_id += 1
+                # get asterisk and set final abstraction
+                abstraction_str = self.__get_asterisk(candidate)
+                self.abstractions[abstraction_id] = {
+                    'abstraction': abstraction_str + ' ' + cluster['abstraction'],
+                    'log_id': log_ids
+                }
+                abstraction_id += 1
 
     def get_abstraction(self):
         # get clusters and event attributes
@@ -188,16 +189,15 @@ class LogAbstraction(object):
 
         # get abstraction
         abstractions = self.__get_all_asterisk()
-        # self.__get_final_abstraction(abstractions)
+        self.__get_final_abstraction(abstractions)
 
         # self.abstractions[abstraction_id] = {'abstraction': str, 'logid': [int, ...]}
-        # return self.abstractions
-        return abstractions
+        return self.abstractions
 
 if __name__ == '__main__':
     logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
     log_abstraction = LogAbstraction(logfile)
     abstraction_results = log_abstraction.get_abstraction()
 
-    # for abs_id, abs_data in abstraction_results.items():
-    #     print(abs_id, abs_data)
+    for abs_id, abs_data in abstraction_results.items():
+        print(abs_id, abs_data['abstraction'])
