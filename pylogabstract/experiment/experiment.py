@@ -1,6 +1,9 @@
 import os
 import errno
+import csv
 from configparser import ConfigParser
+from pylogabstract.abstraction.abstraction import LogAbstraction
+from pylogabstract.output.output import Output
 
 
 class Experiment(object):
@@ -45,6 +48,7 @@ class Experiment(object):
 
         # set experiment result path for a single log file path
         result_path = os.path.join(self.configuration['experiments']['result_path'], self.method)
+        self.__check_path(result_path)
         for full_path, filename in matches:
             self.files[filename] = {
                 'log_path': full_path,
@@ -69,12 +73,69 @@ class Experiment(object):
             # update files dictionary
             self.files[filename].update(properties)
 
+        # evaluation file and directory. to save metrics results such as precision and recall
         self.files['evaluation_file'] = os.path.join(result_path,
                                                      self.configuration['experiments']['evaluation_file'])
 
+    @staticmethod
+    def __get_evaluation_metrics():
+        precision, recall, f1, accuracy = 0., 0., 0., 0.
+
+        metrics = {'precision': precision,
+                   'recall': recall,
+                   'f1': f1,
+                   'accuracy': accuracy}
+        return metrics
+
+    @staticmethod
+    def __run_pylogabstract(log_path):
+        log_abstraction = LogAbstraction(log_path)
+        abstractions = log_abstraction.get_abstraction()
+        raw_logs = log_abstraction.raw_logs
+
+        return abstractions, raw_logs
+
+    def __get_abstraction(self, filename, properties):
+        # run experiment: get abstraction
+        abstractions = {}
+        raw_logs = {}
+        if filename != 'evaluation_file':
+            if self.method == 'pylogabstract':
+                abstractions, raw_logs = self.__run_pylogabstract(properties['log_path'])
+
+        # update abstraction id based on ground truth
+        # abstractions = AbstractionUtility.get_abstractionid_from_groundtruth()
+
+        # write result to file
+        Output.write_perline(abstractions, raw_logs, properties['perline_path'])
+        Output.write_perabstraction(abstractions, raw_logs, properties['perabstraction_path'])
+
+        # get evaluation metrics
+        metrics = self.__get_evaluation_metrics()
+        evaluation_metrics = (filename, metrics['precision'], metrics['recall'], metrics['f1'], metrics['accuracy'])
+
+        return evaluation_metrics
+
     def run_abstraction_serial(self):
+        # initialization
         self.__read_config()
         self.__get_dataset()
+
+        # open evaluation file
+        f = open(self.files['evaluation_file'], 'wt')
+        writer = csv.writer(f)
+
+        # set header for evaluation file
+        header = self.configuration['experiments']['evaluation_file_header'].split('\n')
+        writer.writerow(tuple(header))
+
+        # run the experiment
+        for filename, properties in self.files.items():
+            metrics = self.__get_abstraction(filename, properties)
+            writer.writerow(metrics)
+
+        # close evaluation file
+        f.close()
 
 
 if __name__ == '__main__':
