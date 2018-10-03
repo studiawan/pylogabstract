@@ -1,5 +1,5 @@
 from optparse import OptionParser
-from pylogabstract.abstraction.abstraction import AutoAbstraction
+from pylogabstract.abstraction.abstraction import LogAbstraction
 
 
 def main():
@@ -18,12 +18,14 @@ def main():
     # get options
     (options, args) = parser.parse_args()
     input_file = options.input_file
-    output_file = options.output_file
+    # output_file = options.output_file
 
     # get abstraction
-    aa = AutoAbstraction(input_file)
-    aa.get_abstraction()
-    aa.write_abstraction(output_file)
+    log_abstraction = LogAbstraction(input_file)
+    abstractions = log_abstraction.get_abstraction()
+    print(abstractions)
+
+    # write_abstraction(output_file)
 
 
 if __name__ == "__main__":
