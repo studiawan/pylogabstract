@@ -11,6 +11,7 @@ class LogAbstraction(object):
         self.event_attributes = {}
         self.abstractions = {}
         self.parsed_logs = OrderedDict()
+        self.raw_logs = {}
 
     @staticmethod
     def __get_asterisk(candidate):
@@ -186,18 +187,23 @@ class LogAbstraction(object):
         self.clusters = log_clustering.get_clustering()
         self.event_attributes = log_clustering.event_attributes
         self.parsed_logs = log_clustering.parsed_logs
+        self.raw_logs = log_clustering.raw_logs
 
         # get abstraction
         abstractions = self.__get_all_asterisk()
         self.__get_final_abstraction(abstractions)
 
-        # self.abstractions[abstraction_id] = {'abstraction': str, 'logid': [int, ...]}
+        # self.abstractions[abstraction_id] = {'abstraction': str, 'log_id': [int, ...]}
         return self.abstractions
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
+    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/auth.log'
     log_abstraction = LogAbstraction(logfile)
     abstraction_results = log_abstraction.get_abstraction()
+    rawlogs = log_abstraction.raw_logs
 
     for abs_id, abs_data in abstraction_results.items():
         print(abs_id, abs_data['abstraction'])
+        for logid in abs_data['log_id']:
+            print(rawlogs[logid].rstrip())
+        print('-----')
