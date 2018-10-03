@@ -16,6 +16,7 @@ class LogClustering(object):
         self.event_attributes = {}
         self.preprocess = None
         self.parsed_logs = OrderedDict()
+        self.raw_logs = {}
 
     @staticmethod
     def __convert_to_nodeid_clusterid(partition):
@@ -131,6 +132,7 @@ class LogClustering(object):
         self.message_length_group = self.preprocess.message_length_group
         self.event_attributes = self.preprocess.event_attributes
         self.parsed_logs = self.preprocess.parsed_logs
+        self.raw_logs = self.preprocess.raw_logs
 
         # clustering per group of message length
         # self.clusters[message_length] = {cluster_id: {'nodes': list, 'check': bool}, ...}
