@@ -5,6 +5,7 @@ from pylogabstract.parser.parser import Parser
 class Preprocess(object):
     def __init__(self, log_file):
         self.log_file = log_file
+        self.raw_logs = {}
         self.parsed_logs = OrderedDict()
         self.event_attributes = {}
         self.message_length_group = defaultdict(list)
@@ -13,6 +14,7 @@ class Preprocess(object):
         # parse logs
         parser = Parser(self.log_file)
         self.parsed_logs = parser.parse_logs()
+        self.raw_logs = parser.raw_logs
 
     def get_unique_events(self):
         # get parsed logs
