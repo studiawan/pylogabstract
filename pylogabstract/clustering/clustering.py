@@ -4,7 +4,7 @@ from collections import defaultdict, OrderedDict
 from networkx.algorithms import community
 from operator import itemgetter
 from pylogabstract.preprocess.preprocess import Preprocess
-from pylogabstract.preprocess.create_graph3 import CreateGraph
+from pylogabstract.preprocess.create_graph import CreateGraph
 
 
 class LogClustering(object):
@@ -209,10 +209,9 @@ if __name__ == '__main__':
     results = log_abstraction.get_clustering()
     event_attr = log_abstraction.event_attributes
 
-    print('\nCLUSTERING RESULT')
     for msg_length, result in results.items():
         for cl_id, clust in result.items():
             for no in clust['nodes']:
                 print(cl_id, no, clust['check'], event_attr[no]['message'])
             print('---')
-        print('---')
+        print('---\n')
