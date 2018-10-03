@@ -6,6 +6,7 @@ from pylogabstract.parser.model.config import Config
 class Parser(object):
     def __init__(self, log_file):
         self.log_file = log_file
+        self.raw_logs = {}
         self.model = None
         self.config = None
         self.master_label = {}
@@ -64,6 +65,8 @@ class Parser(object):
         self.master_label = self.__load_label()
         with open(self.log_file) as f:
             for line_index, line in enumerate(f):
+                self.raw_logs[line_index] = line
+
                 words_raw = line.strip().split()
                 ner_label = self.model.predict(words_raw)
 
@@ -77,5 +80,6 @@ if __name__ == "__main__":
     logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
     parser = Parser(logfile)
     result = parser.parse_logs()
+
     # for line_id, parsed_entry in result.items():
     #     print(line_id, parsed_entry)
