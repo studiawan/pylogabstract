@@ -1,0 +1,85 @@
+accepted password
+accepted publickey
+authentication failure
+check pass
+connection closed
+connection reset by peer
+did not receive identification string
+failed password
+ignoring max retries
+invalid user
+pam adding faulty module
+pam unable to dlopen
+received disconnect
+received signal
+reverse mapping checking getaddrinfo
+server listening
+session closed
+session opened
+this does not map back to the address
+unknown option
+error: connect_to
+open failed
+root login refused
+bad protocol version identification
+subsystem request
+protocol major versions differ
+failed none
+expired password
+unable to open env file
+dispatch_protocol_error
+syslogin_perform_logout
+corrupted mac
+write ident string
+successful su
+root:nobody
+change user
+changed password
+new group
+new user
+changed user
+password changed
+root:
+error: bind to port
+received sighup
+user not in sudoers
+exiting on signal
+:root
+new password not acceptable
+user1 : tty=
+root : tty=pts
+user3 : tty=
+root : tty=unknown
+unable to resolve host
+failed su
+delete user
+removed group
+failed login
+lastlog_openseek
+lastlog_perform_login
+pam_succeed_if
+illegal user
+start:
+scanned from
+last message repeated
+fatal: mm_request_send:
+fatal: timeout before authentication
+fail:
+pam_timestamp: updated timestamp
+root privileges on behalf
+nox11 mode, ignoring pam_tty
+auth could not identify password
+--hide-main-window --non-interactive
+ubuntu sudo:   ubuntu :
+: root login  on
+adding removable location:
+removing removable location:
+failed to send buffer
+user=root ;
+failed to contact configuration server;
+x11 initialization failed
+]: )
+: conversation failed
+: no such file or directory
+: cannot determine username
+: bad username [

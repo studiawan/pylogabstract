@@ -1,0 +1,675 @@
+ubuntu syslogd
+kernel: inspecting
+cannot find map file
+symbols from
+acpi: wmi:
+uses 32-bit capabilities
+apm: bios version
+apm: overridden
+lp0: using
+ppdev: user-space
+bluetooth: core
+bluetooth: hci device
+bluetooth: hci socket
+bluetooth: l2cap
+bluetooth: sco
+bluetooth: rfcomm
+bluetooth: bnep
+bridge firewalling
+dropping netif_f_ufo
+link is up at
+flow control is off for
+disabled privacy extensions
+apm: disabled
+initializing cgroup subsys
+linux version
+bios-provided physical ram map
+bios-e820:
+last_pfn =
+kernel direct mapping tables up to
+ramdisk:
+allocated new ramdisk:
+move ramdisk from
+dmi 2.3 present.
+acpi: rsdp
+acpi: rsdt
+acpi: facp
+acpi: dsdt
+acpi: facs
+acpi: ssdt
+acpi: apic
+acpi: boot
+highmem available
+lowmem available
+mapped low ram:
+low ram:
+bootmap
+early reservations) ==> bootmem
+bios data page ==>
+trampoline ==>
+text data bss ==>
+init_pg_table ==>
+bios reserved ==>
+pgtable ==> 
+new ramdisk ==>
+found smp mp-table at
+zone pfn ranges:
+dma      0x
+normal   0x
+highmem  0x
+movable zone start pfn for each node
+active pfn ranges
+on node 0 totalpages:
+free_area_init_node: node
+dma zone:
+normal zone:
+highmem zone:
+acpi: pm-timer io port:
+acpi: local apic address
+acpi: lapic (acpi_id
+acpi: ioapic
+apic_id 1, version 32, address
+acpi: int_src_ovr
+used by override
+enabling apic mode:
+using acpi (madt) for smp configuration information
+smp: allowing 4 cpus
+mapped apic to
+mapped ioapic to
+pm: registered nosave memory:
+allocating pci resources starting at
+percpu: allocating
+nr_cpus: 
+zonelists in zone order, mobility grouping on
+kernel command line:
+enabling fast fpu save and restore
+enabling unmasked simd fpu exception support
+initializing cpu
+pid hash table entries:
+tsc: pit calibration confirmed by pmtimer
+tsc: using pmtimer calibration value
+mhz processor
+console: colour vga
+console [
+dentry cache hash table entries:
+inode-cache hash table entries:
+] memory: 
+virtual kernel memory layout:
+fixmap  : 
+pkmap   : 
+vmalloc : 
+lowmem  : 
+.init :
+.data :
+.text :
+checking if this processor honours the wp bit even in supervisor mode
+cpa: page pool initialized
+slub: genslabs
+calibrating delay loop
+security framework initialized
+selinux:  disabled at boot.
+apparmor: apparmor initialized
+mount-cache hash table entries:
+cpu: trace cache: 
+cpu: hyper-threading
+checking 'hlt' instruction
+smp alternatives:
+acpi: core revision
+acpi: checking initramfs
+enabling io-apic irqs
+..timer: vector
+cpu0: intel
+brought up 
+total of 
+attaching sched-domain:
+]  domain
+]   groups: 
+net_namespace: 
+booting paravirtualized kernel on bare hardware
+] time: 
+net: registered protocol family
+eisa bus registered 
+acpi: bus type pci registered
+pci: pci bios revision
+pci: using configuration type
+acpi: ec: look up ec in dsdt
+acpi: interpreter enabled
+acpi: (supports
+acpi: using ioapic for
+acpi: pci root bridge 
+] pci: 
+] cpu: 
+] pci 
+* the chipset may have pm-timer bug
+* this clock source is slow
+* this bug, please use
+hpet not enabled in bios
+acpi: pci interrupt routing table
+acpi: pci interrupt link
+] bus 
+linux plug and play support
+pnp: pnp acpi
+acpi: bus type pnp
+: io resource 
+acpi: acpi bus type
+pnpbios: disabled
+netlabel: initializing
+netlabel:  domain hash
+netlabel:  protocols
+netlabel:  unlabeled traffic
+pages allocated for
+actual entries
+apparmor: apparmor 
+acpi: rtc can wake
+: iomem range
+: ioport range
+ip route cache hash table entries
+tcp established hash table entries:
+tcp bind hash table entries:
+tcp: hash tables configured
+tcp reno registered
+checking if image is initramfs
+switched to high resolution
+freeing initrd memory:
+simple boot flag value
+simple boot flag at
+audit: initializing netlink
+] type=
+highmem bounce pool size:
+hugetlb registered
+vfs: disk quotas
+dquot-cache hash table entries:
+msgmni has been set
+io scheduler
+isapnp: scanning 
+isapnp: no plug
+irq sharing enabled
+ttys0 at i/o
+brd: module loaded
+input: macintosh mouse button emulation
+pnp: ps/2 controller
+pnp: ps/2 appears to have aux port disabled
+kbd port at
+mouse device common for all mice
+rtc core: registered
+alarms up to one day
+eisa: probing bus
+eisa: detected
+cpuidle: using governor
+tcp cubic registered
+using ipi no-shortcut
+registered taskstats
+magic number: 
+: hash matches
+setting system clock to
+bios edd facility
+edd information not available
+freeing unused kernel memory
+write protecting the kernel 
+at translated set 2 keyboard as
+fuse init
+processor acpi
+usbcore: registered new
+pci int d
+setting latency timer
+ehci host controller
+new usb bus registered
+debug port
+cache line size of
+usb universal host controller interface driver
+usb usb1: configuration
+usb hub found
+, io mem
+usb 2.0 started,
+ports detected
+no dock devices found
+scsi subsystem initialized
+libata version
+: pci int
+uhci host controller
+, io base
+chosen from
+speed usb device using
+sonics silicon backplane found
+: ata_piix
+: pata max
+: broadcom
+ata_piix 
+ata-7: hitachi
+sectors, multi
+configured for udma
+initializing usb mass storage
+scsi emulation for usb mass storage
+device found at
+waiting for device to settle before scanning
+logitech usb trackball as
+usb mass storage support registered
+usb hid core driver
+, max udma/
+: direct-access
+: usb hid
+attached scsi generic
+: cd-rom
+needs updating - please
+byte hardware sectors
+write protect is off
+mode sense:
+write cache:
+]  sda1
+b44.c:
+attached scsi
+mmc drive:
+uniform cd-rom driver
+device scan complete
+assuming drive cache:
+]  sdb:
+] aufs
+loop: module loaded
+squashfs: version
+kjournald starting.
+internal journal
+deleting unreferenced inode
+orphan inodes deleted
+recovery complete
+mounted filesystem with ordered data mode
+udevd version
+linux agpgart interface
+m chipset
+itco_vendor_support: vendor-support
+stolen memory
+intel tco watchdog timer driver
+found a ich4 tco device
+itco_wdt: initialized
+: agp aperture is
+standard hot plug pci controller
+fwh not detected
+input: power button
+acpi: power button
+reported by plug and play acpi
+pc-style at
+pc speaker as
+: measured
+: clocking to
+dell systems management base driver
+netfilter core team
+]     0: 0x
+using pit calibration value
+controller found. probing
+aux port at
+nothing has been logged yet
+ubuntu -- mark --
+failed to find original dlopen
+failed: operation not permitted
+ubuntu exiting on signal
+could not associate with desktop session
+found user
+successfully dropped
+avahi-daemon 0.6.23 starting up
+successfully called
+failed: no such file or directory
+failed to open
+no service file found
+network interface enumeration completed
+registering hinfo record with values
+server startup complete
+client connected from
+bluetooth daemon
+starting sdp server
+starting experimental netlink support
+failed to find bluetooth netlink family
+can't init plugin
+bridge pan0 created
+<info>  starting... 
+eth0: driver is
+found new ethernet device
+(eth0): exported as
+trying to start
+scplugin-ifupdown: init!
+scplugin-ifupdown: update_system_hostname
+scpluginifupdown: management mode: unmanaged
+scplugin-ifupdown: devices added
+scplugin-ifupdown: end _init.
+loaded plugin
+... get_connections
+connections count
+get unmanaged devices count
+client connected from
+device state change
+bringing up device
+preparing device
+deactivating device
+adding default connection
+unable to find provider
+carrier now on
+device state change
+activation (eth0) starting connection
+(device prepare)
+(device configure)
+(ip configure start)
+beginning dhcp transaction
+dhclient started with pid
+internet systems consortium dhcp
+copyright
+all rights reserved
+for info, please visit
+device eth0 state changed
+listening on
+sending on
+dhcpdiscover
+dhcpoffer
+dhcprequest
+dhcpack
+(ip configure get)
+<info>    address
+<info>    prefix
+<info>    gateway
+<info>    nameserver
+(ip configure commit)
+joining mdns multicast group on interface
+new relevant interface
+registering new address record
+dhclient: bound to
+<info>  policy set
+<info>  activation
+step time server
+failed to register before timeout
+killed by term signal
+bridge pan0 removed
+stopping sdp server
+got sigterm, quitting
+leaving mdns multicast group on interface
+mounted /dev/sda1
+warning: unable to activate console:
+cmdline options:
+mount options:
+logout returned an exit status
+: exit
+invalid legacy unicast query packet
+last message repeated
+received response with invalid source port
+external fuse
+value location for
+instance of invalid non-instantiatable type
+g_signal_emit_valist: assertion
+g_object_unref: assertion
+/etc/cron.hourly
+(cron) info
+(cron) startup
+/etc/cron.monthly
+session manager not running
+module.c: failed to load  module
+/etc/cron.daily
+invoke-rc.d anacron start
+
+logitech optical usb
+hci usb driver
+hci socket layer initialized
+hci device and connection
+core ver
+registered misc device
+first accessible region
+dma_sb_region_create
+: mac addr
+internal vlan enabled
+pages for linear map
+starting manual resume from disk
+usb 0.0 started
+ohci host controller
+: ps3rom
+ps3da: ps3da
+is a fujitsu
+'open' host controller
+registered block device major
+usb disconnect,
+initialised: dm-devel
+uevent: version
+system bus speed for pio modes
+uniform multi-platform 
+generic rtc driver
+hvsi: registered
+driver hvc_console registering
+of video memory
+switching to colour frame buffer device
+total hugetlb memory
+cpu hotplug not supported
+linux ppc64
+ibm ebus device driver
+]    groups:
+]   domain
+] processor
+decrementer mult[
+capability lsm initialized
+freeing bootmem node
+colour dummy device
+timebase mult[
+ frequency 
+zone: dma
+zonelists in node order
+setup done
+]   movable zone:
+]     0:
+]   normal
+]   dma
+bounce buffer:
+videomemory:
+firmware version
+entering add_active_range
+memory hole size:
+top of ram:
+setup arch
+htab_hash_mask
+physicalmemorysize
+ppc64_pft_size
+thread shift is
+cpu maps initialized
+found initrd at
+page orders: linear mapping
+using ps3 machine
+for crashkernel (system ram:
+crash kernel location must be
+-----------------------------------------------------
+*** 0000 : cf
+*** 0000 : #1 smp
+swap on /dev
+generic bluetooth usb driver
+ps3_lpm_probe:
+ehci_hcd should always be loaded 
+'enhanced' host controller
+mib of gpu memory
+created ram cache:
+rpc: registered
+ipv6 over ipv4 tunneling
+block layer scsi generic
+no test for stdrng
+testing dynamic ftrace
+testing tracer 
+create slab
+groups: 
+span 0-1 level
+processor 1 found
+ftrace: allocating
+available (
+per task-struct memory footprint
+memory used by lock dependency
+... max_lockdep_subclasses:
+... max_lock_depth:
+... max_lockdep_keys:
+... classhash_size:
+... max_lockdep_entries:
+... max_lockdep_chains:
+... chainhash_size:
+lock dependency validator:
+0: 0x00000000 ->
+pages used for memmap
+link is not ready
+sda: sda1
+allocate port service
+assign_interrupt_mode found msi
+]   io window:
+]   mem window:
+]   prefetch window:
+registered nosave memory region:
+nf_conntrack version 
+using parport0
+imps/2 generic wheel mouse
+renamed network interface
+ac adapter [acad]
+host smbus controller not enabled
+detected an intel
+orphan cleanup on readonly
+write access will be enabled during
+recovery required on readonly
+resume from disk failed
+checking swsusp image
+resume from partition
+attempting manual resume
+cache data unavailable
+network connection
+wide scsi
+ending domain validation
+domain validation skipping write
+beginning domain validation
+: capabilities=
+is a post-
+floppy drive(s):
+initiating bringup
+intel corporation
+network driver - version
+fusion mpt spi host driver
+lsi corporation
+fusion mpt base driver
+] (supports
+unable to open rtc device
+hash matches device
+ramdisk driver initialized:
+real time clock driver
+boot video device is
+limiting direct pci
+): initialized
+works better, please notify
+please send dmi info above to
+acpi: dmi system vendor:
+acpi: dmi product name:
+acpi: dmi product version:
+acpi: dmi board name:
+acpi: dmi bios vendor:
+acpi: dmi bios date:
+query ignored
+apic timer
+apic timer calibration result
+looking for dsdt in initramfs
+early unpacking initramfs
+failure registering capabilities with primary
+unable to locate rio grande
+detecting calgary via bios
+checking aperture
+extended cmos year
+smp: allowing
+setting apic routing
+ioapic[0]: apic_id
+acpi: lapic_nmi
+bootmem setup node
+faking a node at
+no numa configuration found
+srat: node
+acpi: srat
+acpi: mcfg
+acpi: xsdt
+dmi present
+end_pfn_map = 
+command line:
+ -> node 
+serial8250: ttys
+ttys1 at i/o
+scsi2 : ioc0:
+e1000_probe:
+piix4_smbus
+nic link is up
+is already registered
+generic explorer mouse as
+battery slot
+ac adapter 
+acpi: sleep button
+input: sleep button
+sata link up
+sata max udma
+scsi0 : ahci
+ncq stag only
+impl sata mode
+: version
+: new usb device found
+: manufacturer: 
+: serialnumber:
+new usb device strings:
+on irq
+probing ide interface
+: bm-dma at
+native mode: will probe
+: ide controller
+no ibft detected
+registered platform rtc
+using pic for interrupt
+setting up standard pci
+smp disabled
+smp motherboard 
+weird, boot cpu
+acpi: setting elcr
+using mwait in idle
+intel machine check reporting
+intel machine check architecture
+l1 d cache:
+probably due to long platform
+failed to get a good estimate
+found and enabled local
+dmi 2.5 present
+]   highmem
+] ---[ end trace
+]  =======================
+warn_on_slowpath
+_spin_lock_irqsave
+_spin_unlock_irqrestore
+release_console_sem
+printk
+mtrr_wrmsr
+printk
+mtrr_trim_uncached_memory
+setup_arch
+start_kernel
+warning: strange,
+modules linked in:
+comm: swapper not tainted
+------------[ cut
+calibrating delay using timer
+it is
+ps3 sound started
+driver loaded but no devices
+association failed
+stale pid file
+link becomes ready
+syslogd 1.5
+ps3 -- mark --
+lost page write due to
+sense key :
+[sdb] asc=
+symbols match kernel version
+exiting on signal
+]  ps3da5
+maximal mount count reached
+gelic_wl_associate_bss: connected
+wrong wep key
+result: hostbyte
+last message repeated
+kernel:  sdb: sdb1
+off: module license
+---offsets---
+kernel:  sda:
+syslog-ng starting up
+: segfault at
+termination requested
+syslog-ng shutting down
+kernel: imklog
+origin software="rsyslogd"
+hdc: vbox cd-rom
+hdc: udma
+hdc: atapi
+shutting down for

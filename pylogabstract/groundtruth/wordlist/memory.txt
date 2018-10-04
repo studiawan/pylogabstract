@@ -1,0 +1,92 @@
+warn terminating with signal
+died  killed (terminated)
+opened log file
+trusting ca cert from
+ovsdb-server (open vswitch)
+peak resident set size
+memory info cells
+connection dropped (connection r
+connection dropped (protocol error)
+routines:ssl3_read_bytes:tlsv1 alert unknown
+log messages in last
+normalization changed
+flow_mods
+connection closed by peer
+: connecting...
+seconds before reconnect
+continuing to retry connections
+: connected
+library:fopen:no such file
+check_private_key:key values mismatch
+routines:file_ctrl:system lib
+added primary controller
+removed primary controller
+certificate verify failed
+certificate verify failed
+numa nodes and
+cpu cores on numa node
+datapath supports recirculation
+mpls label stack length probed 
+datapath supports unique flow
+received packet on unassociated datapath
+added interface
+using datapath id
+added service controller
+ovs-vswitchd (open vswitch)
+unreasonably long
+context switches:
+event coverage  avg rate
+bridge_reconfigure
+ofproto_flush
+ofproto_packet_out
+ofproto_recv_openflow
+ofproto_update_port
+ofproto_dpif_expired
+rev_reconfigure
+rev_port_toggled
+rev_flow_table
+dumped_new_flow
+xlate_actions
+pktbuf_retrieved
+cmap_expand
+dpif_port_add
+pre: ip in_port=
+post: ip in_port=
+dpif_flow_flush
+dpif_flow_get
+dpif_flow_put
+dpif_flow_del
+dpif_execute
+flow_extract
+miniflow_malloc
+hmap_pathological
+hmap_expand
+netdev_get_stats
+txn_unchanged
+txn_incomplete
+info handlers:
+txn_success
+poll_create_node
+poll_zero_timeout
+rconn_queued
+pstream_open
+stream_open
+util_xalloc
+vconn_open
+connection failed (protocol not available)
+:no certificate assigned
+for reading: no such file
+vconn_received
+vconn_sent
+netdev_set_policing
+netdev_arp_lookup
+netdev_get_ifindex
+netdev_get_hwaddr
+netdev_get_ethtool
+netlink_received
+netlink_recv_jumbo
+netlink_sent
+nln_changed
+events never hit
+netdev_set_hwaddr
+netdev_set_ethtool

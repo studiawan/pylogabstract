@@ -1,0 +1,249 @@
+found user
+successfully dropped
+avahi-daemon 0.6.23 starting up
+successfully called
+failed: no such file or directory
+failed to open
+no service file found
+network interface enumeration completed
+registering hinfo record with values
+server startup complete
+client connected from
+bluetooth daemon
+starting sdp server
+starting experimental netlink support
+failed to find bluetooth netlink family
+can't init plugin
+bridge pan0 created
+<info>  starting... 
+eth0: driver is
+found new ethernet device
+(eth0): exported as
+trying to start
+scplugin-ifupdown: init!
+scplugin-ifupdown: update_system_hostname
+scpluginifupdown: management mode: unmanaged
+scplugin-ifupdown: devices added
+scplugin-ifupdown: end _init.
+loaded plugin
+... get_connections
+connections count
+get unmanaged devices count
+client connected from
+device state change
+bringing up device
+preparing device
+deactivating device
+adding default connection
+unable to find provider
+carrier now on
+device state change
+activation (eth0) starting connection
+(device prepare)
+(device configure)
+(ip configure start)
+beginning dhcp transaction
+dhclient started with pid
+internet systems consortium dhcp
+copyright
+all rights reserved
+for info, please visit
+device eth0 state changed
+listening on
+sending on
+dhcpdiscover
+dhcpoffer
+dhcprequest
+dhcpack
+(ip configure get)
+<info>    address
+<info>    prefix
+<info>    gateway
+<info>    nameserver
+(ip configure commit)
+joining mdns multicast group on interface
+new relevant interface
+registering new address record
+dhclient: bound to
+<info>  policy set
+<info>  activation
+step time server
+failed to register before timeout
+killed by term signal
+bridge pan0 removed
+stopping sdp server
+got sigterm, quitting
+leaving mdns multicast group on interface
+mounted /dev/sda1
+warning: unable to activate console:
+cmdline options:
+mount options:
+logout returned an exit status
+: exit
+invalid legacy unicast query packet
+last message repeated
+received response with invalid source port
+external fuse
+value location for
+instance of invalid non-instantiatable type
+g_signal_emit_valist: assertion
+g_object_unref: assertion
+hal disappeared
+disconnected by the system
+disconnected from the system bus
+devices removed
+registered interface
+hci dev 0
+has been enabled
+starting security manager
+wlan0: driver is
+driver does not support
+found new
+(wlan0): exported as
+guessed connection type
+update_connection_setting_from_if_block
+addresses count:
+autoconnect
+device added
+now unmanaged
+unmanaged device found; 
+supplicant manager is
+supplicant interface state
+unable to locate theme engine
+failed to reply before timeout
+warning: unable to find desktop file
+can't find host
+no servers can be used
+carrier now off
+no longer relevant for mdns
+withdrawing address record for
+instance with invalid (null)
+files changed, reloading
+hal re-appeared
+no working leases in persistent database
+can't create gn bridge
+driver supports ssid
+couldn't authenticate user
+can't remove gn bridge
+trying recorded lease
+on behalf of uid
+receive_packet failed on
+rtnetlink answers: no such process
+forcibly attempting to lazy unmount
+starting with address
+callout bind, address
+successfully claimed ip address
+callout stop, address
+network is unreachable
+please consult readme file
+there is already a pid file
+killed old client process
+: permission denied
+bind socket to interface:
+adjust time server
+please remember to set
+to do so, start the server,
+/usr/bin/mysqladmin -u root password
+/usr/bin/mysqladmin -u root -h
+alternatively you can run
+/usr/bin/mysql_secure_installation
+which will also give you the option
+databases and anonymous user
+strongly recommended for production servers
+see the manual for more
+please report any problems
+the latest information about mysql
+found a configuration for the `ping' plugin
+cannot open shared object file:
+: precision =
+: ntpd 4.2.4
+checking for crashed mysql tables
+warning: mysql.user contains
+checking for insecure root
+this installation of mysql
+]: looking for
+upgrading mysql tables
+]: started
+shutting down collectdmon
+collectd was terminated
+]: ended
+]: uptime: 
+]: +----+
+]:  the tables
+improperly closed tables
+client is using or hasn't closed
+django.experiments_dailyconversion
+mysqlcheck has found corrupt tables
+bad udp checksums in
+| debian-sys-maint
+| id | user
+kernel time sync status
+synchronized to
+]: version:
+ready for connections
+innodb: started;
+innodb: buffer
+restoring possible half-written
+frequency initialized
+reading tablespace information
+starting crash recovery
+database was not shut down
+the log sequence number in
+ntpd exiting on signal
+: time reset
+main process ended
+couldn't resolve
+host name not found:
+signal_no_reset: signal
+innodb: shutdown completed
+innodb: starting shutdown
+: normal shutdown
+mysqld: shutdown complete
+daemon exited gracefully
+seconds exceeds sanity limit
+no servers reachable
+failed to initialize interface for address
+unable to create socket on
+: bind() fd
+dhcprelease on
+deleting interface
+collectd terminated with exit
+http://www.mysql.com
+support mysql by buying
+no database selected
+[error] aborting
+the first specified data file
+new database to be created
+innodb: setting file
+database physically writes
+did not exist: new to be created
+setting log file
+doublewrite buffer not found
+doublewrite buffer created
+creating foreign key constraint
+foreign key constraint system
+running 'mysqlcheck'...
+mysql.columns_priv
+mysql.db
+mysql.func
+mysql.help_category
+mysql.help_keyword
+mysql.help_relation
+mysql.help_topic
+mysql.host
+mysql.proc
+mysql.procs_priv
+mysql.tables_priv
+mysql.time_zone
+mysql.time_zone_leap_second
+mysql.time_zone_name
+mysql.time_zone_transition
+mysql.time_zone_transition_type
+number of processes running
+mysqld process hanging
+]: restarted
+]: mysql.user
+]: running 
+]: ok 
+switching to runlevel:
+un-registering and exiting
