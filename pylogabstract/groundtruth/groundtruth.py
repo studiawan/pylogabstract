@@ -2,7 +2,7 @@ import os
 import json
 import errno
 from configparser import ConfigParser
-from pylogabstract.parser.parser import Parser
+from pylogabstract.preprocess.preprocess import Preprocess
 
 
 class GroundTruth(object):
@@ -71,15 +71,52 @@ class GroundTruth(object):
 
         return wordlist
 
-    def __set_label(self, log_file, labeled_file, wordlist):
-        pass
+    def __set_abstraction_label(self, log_file, labeled_file, wordlist):
+        # preprocessing
+        parsed_logs, raw_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
+
+        # open labeled/ground truth file
+        f = open(labeled_file, 'w')
+        print('%-20s' % 'Labeled file:', labeled_file)
+
+        # label each log line
+        # note that write to labeled file is not ordered by line id anymore
+        # as the process is based on message length group
+        semicolon = '; '
+        lineid_label = {}
+        for message_length, unique_event_id in message_length_group.items():
+            for event_id in unique_event_id:
+                for line_ids in event_attributes[event_id]['member']:
+                    for line_id in line_ids:
+                        log_lower = raw_logs[line_id].lower().strip()
+                        flag = True
+                        for index, label in enumerate(wordlist):
+                            if label in log_lower:
+                                f.write(str(index) + semicolon + label + semicolon + line_id + semicolon +
+                                        raw_logs[line_id])
+                                lineid_label[line_id] = index
+                                flag = False
+                                break
+
+                        if flag:
+                            print(log_lower)
+                            f.write('-1; other; ' + line_id + semicolon + raw_logs[line_id])
+                            lineid_label[line_id] = -1
+
+        # close labeled file
+        f.close()
+
+        return lineid_label
 
     @staticmethod
-    def __get_preprocessed_logs(logfile):
-        parser = Parser(logfile)
-        parsed_logs = parser.parse_logs()
+    def __get_preprocessed_logs(log_file):
+        preprocess = Preprocess(log_file)
+        parsed_logs = preprocess.parsed_logs
+        raw_logs = preprocess.raw_logs
+        message_length_group = preprocess.message_length_group
+        event_attributes = preprocess.event_attributes
 
-        return parsed_logs
+        return parsed_logs, raw_logs, message_length_group, event_attributes
 
     def __get_perabstraction(self):
         pass
@@ -107,7 +144,7 @@ class GroundTruth(object):
                 log_file = os.path.join(self.configurations[self.dataset]['base_dir'], filename)
                 labeled_file = os.path.join(self.configurations[self.dataset]['labeled_dir'], filename)
                 wordlist = self.__read_wordlist(logtype)
-                self.__set_label(log_file, labeled_file, wordlist)
+                self.__set_abstraction_label(log_file, labeled_file, wordlist)
 
             # get abstraction for each group/cluster
             self.__get_perabstraction()
