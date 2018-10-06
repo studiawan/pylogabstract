@@ -2,7 +2,9 @@ import os
 import json
 import errno
 from configparser import ConfigParser
+from collections import defaultdict
 from pylogabstract.preprocess.preprocess import Preprocess
+from pylogabstract.output.output import Output
 
 
 class GroundTruth(object):
@@ -71,19 +73,23 @@ class GroundTruth(object):
 
         return wordlist
 
-    def __set_abstraction_label(self, log_file, labeled_file, wordlist):
-        # preprocessing
-        parsed_logs, raw_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
+    @staticmethod
+    def __get_preprocessed_logs(log_file):
+        preprocess = Preprocess(log_file)
+        raw_logs = preprocess.raw_logs
+        message_length_group = preprocess.message_length_group
+        event_attributes = preprocess.event_attributes
 
-        # open labeled/ground truth file
-        f = open(labeled_file, 'w')
-        print('%-20s' % 'Labeled file:', labeled_file)
+        return raw_logs, message_length_group, event_attributes
+
+    def __set_abstraction_label(self, log_file, wordlist):
+        # preprocessing
+        raw_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
 
         # label each log line
         # note that write to labeled file is not ordered by line id anymore
         # as the process is based on message length group
-        semicolon = '; '
-        lineid_label = {}
+        groups = defaultdict(list)
         for message_length, unique_event_id in message_length_group.items():
             for event_id in unique_event_id:
                 for line_ids in event_attributes[event_id]['member']:
@@ -92,34 +98,80 @@ class GroundTruth(object):
                         flag = True
                         for index, label in enumerate(wordlist):
                             if label in log_lower:
-                                f.write(str(index) + semicolon + label + semicolon + line_id + semicolon +
-                                        raw_logs[line_id])
-                                lineid_label[line_id] = index
+                                groups[index].append(line_id)
                                 flag = False
                                 break
 
                         if flag:
                             print(log_lower)
-                            f.write('-1; other; ' + line_id + semicolon + raw_logs[line_id])
-                            lineid_label[line_id] = -1
+                            groups[-1].append(line_id)
 
-        # close labeled file
-        f.close()
-
-        return lineid_label
+        return groups, raw_logs
 
     @staticmethod
-    def __get_preprocessed_logs(log_file):
-        preprocess = Preprocess(log_file)
-        parsed_logs = preprocess.parsed_logs
-        raw_logs = preprocess.raw_logs
-        message_length_group = preprocess.message_length_group
-        event_attributes = preprocess.event_attributes
+    def __get_asterisk(candidate):
+        # candidate: list of list
+        abstraction = ''
 
-        return parsed_logs, raw_logs, message_length_group, event_attributes
+        # transpose row to column
+        candidate_transpose = list(zip(*candidate))
+        candidate_length = len(candidate)
 
-    def __get_perabstraction(self):
-        pass
+        if candidate_length > 1:
+            # get abstraction
+            abstraction_list = []
+            for index, message in enumerate(candidate_transpose):
+                message_length = len(set(message))
+                if message_length == 1:
+                    abstraction_list.append(message[0])
+                else:
+                    abstraction_list.append('*')
+
+            abstraction = ' '.join(abstraction_list)
+
+        elif candidate_length == 1:
+            abstraction = ' '.join(candidate[0])
+
+        return abstraction
+
+    def __get_perabstraction(self, groups, raw_logs):
+        abstractions = {}
+        abstraction_id = 0
+        for group_id, line_ids in groups.items():
+            candidate = []
+            for line_id in line_ids:
+                candidate.append(raw_logs[line_id].split())
+
+            abstractions[abstraction_id] = {
+                'abstraction': self.__get_asterisk(candidate),
+                'log_id': line_ids
+            }
+            abstraction_id += 1
+
+        return abstractions
+
+    def __save_groundtruth(self, abstractions, log_file):
+        # save abstraction ground truth
+        # 1. every log line with abstraction id
+        # 2. list of abstraction id and its corresponding abstraction (with asterisk)
+        lineid_abstractionid = {}
+        abstraction_withid = {}
+        for abstraction_id, abstraction in abstractions.items():
+            abstraction_withid[abstraction_id] = abstraction['abstraction']
+            for line_id in abstraction['original_id']:
+                lineid_abstractionid[line_id] = abstraction_id
+
+        # get directory
+        lineid_abstractionid_dir = self.configurations[self.dataset]['lineid_abstractionid_dir']
+        abstraction_withid_dir = self.configurations[self.dataset]['abstraction_withid_dir']
+
+        # check path
+        self.__check_path(lineid_abstractionid_dir)
+        self.__check_path(abstraction_withid_dir)
+
+        # write ground truth to json file
+        self.__write_to_json(os.path.join(lineid_abstractionid_dir, log_file), lineid_abstractionid)
+        self.__write_to_json(os.path.join(abstraction_withid_dir, log_file), abstraction_withid)
 
     def get_ground_truth(self):
         # initialization
@@ -142,12 +194,18 @@ class GroundTruth(object):
             for filename in file_list:
                 # note that file extension is removed
                 log_file = os.path.join(self.configurations[self.dataset]['base_dir'], filename)
-                labeled_file = os.path.join(self.configurations[self.dataset]['labeled_dir'], filename)
                 wordlist = self.__read_wordlist(logtype)
-                self.__set_abstraction_label(log_file, labeled_file, wordlist)
+                groups, raw_logs = self.__set_abstraction_label(log_file, wordlist)
 
-            # get abstraction for each group/cluster
-            self.__get_perabstraction()
+                # get abstraction for each group/cluster
+                abstractions = self.__get_perabstraction(groups, raw_logs)
+
+                # write per abstraction
+                perabstraction_file = os.path.join(self.configurations[self.dataset]['perabstraction_dir'], filename)
+                Output.write_perabstraction(abstractions, raw_logs, perabstraction_file)
+
+                # save ground truth
+                self.__save_groundtruth(abstractions, filename)
 
 
 if __name__ == '__main__':
@@ -155,7 +213,7 @@ if __name__ == '__main__':
     wordlist_directory = ''
     dataset_list = ['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal',
                     'dfrws-2016', 'honeynet-challenge5', 'honeynet-challenge7']
-    dataset_name = ''
+    dataset_name = dataset_list[0]
 
     gt = GroundTruth(dataset_name, datasets_config, wordlist_directory)
     gt.get_ground_truth()
