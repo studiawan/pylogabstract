@@ -1,22 +1,22 @@
 import community as commun
 import networkx as nx
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 from networkx.algorithms import community
 from operator import itemgetter
 from pylogabstract.preprocess.preprocess import Preprocess
 from pylogabstract.preprocess.create_graph import CreateGraph
+from pylogabstract.parser.parser import Parser
 
 
 class LogClustering(object):
-    def __init__(self, log_file):
-        self.log_file = log_file
+    def __init__(self, parsed_logs, raw_logs):
         self.clusters = defaultdict(dict)
         self.cluster_id = 0
         self.message_length_group = {}
         self.event_attributes = {}
         self.preprocess = None
-        self.parsed_logs = OrderedDict()
-        self.raw_logs = {}
+        self.parsed_logs = parsed_logs
+        self.raw_logs = raw_logs
 
     @staticmethod
     def __convert_to_nodeid_clusterid(partition):
@@ -127,18 +127,14 @@ class LogClustering(object):
 
     def __get_clusters(self):
         # preprocess
-        self.preprocess = Preprocess(self.log_file)
+        self.preprocess = Preprocess(self.parsed_logs, self.raw_logs)
         self.preprocess.get_unique_events()
         self.message_length_group = self.preprocess.message_length_group
         self.event_attributes = self.preprocess.event_attributes
-        self.parsed_logs = self.preprocess.parsed_logs
-        self.raw_logs = self.preprocess.raw_logs
 
         # clustering per group of message length
         # self.clusters[message_length] = {cluster_id: {'nodes': list, 'check': bool}, ...}
         for message_length, group in self.message_length_group.items():
-            # print(message_length, group)
-
             # no graph needed as there is only one node
             group_length = len(group)
             if group_length == 1:
@@ -181,12 +177,12 @@ class LogClustering(object):
                     new_clusters[message_length] = clusters
 
         for message_length, clusters in new_clusters.items():
-                for cluster_id, cluster in clusters.items():
-                    self.clusters[message_length][self.cluster_id] = {
-                        'nodes': cluster,
-                        'check': True
-                    }
-                    self.cluster_id += 1
+            for cluster_id, cluster in clusters.items():
+                self.clusters[message_length][self.cluster_id] = {
+                    'nodes': cluster,
+                    'check': True
+                }
+                self.cluster_id += 1
 
         # empty/remove the current cluster
         # self.clusters.pop(cluster_id, None)
@@ -206,11 +202,17 @@ def lightest(g):
 
 
 if __name__ == '__main__':
+    # parse log file
     logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
-    log_abstraction = LogClustering(logfile)
+    parser = Parser()
+    parsed_results, raw_results = parser.parse_logs(logfile)
+
+    # get clusters
+    log_abstraction = LogClustering(parsed_results, raw_results)
     results = log_abstraction.get_clustering()
     event_attr = log_abstraction.event_attributes
 
+    # print clustering results
     for msg_length, result in results.items():
         for cl_id, clust in result.items():
             for no in clust['nodes']:
