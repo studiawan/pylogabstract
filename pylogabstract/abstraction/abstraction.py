@@ -1,17 +1,13 @@
 from itertools import combinations
-from collections import OrderedDict
 from pylogabstract.clustering.clustering import LogClustering
 from pylogabstract.preprocess.hamming_similarity import HammingSimilarity
+from pylogabstract.parser.parser import Parser
 
 
 class LogAbstraction(object):
-    def __init__(self, log_file):
-        self.log_file = log_file
-        self.clusters = {}
-        self.event_attributes = {}
-        self.abstractions = {}
-        self.parsed_logs = OrderedDict()
-        self.raw_logs = {}
+    def __init__(self):
+        # initiate log parsing
+        self.parser = Parser()
 
     @staticmethod
     def __get_asterisk(candidate):
@@ -131,16 +127,16 @@ class LogAbstraction(object):
 
         return checked_abstractions
 
-    def __get_all_asterisk(self):
+    def __get_all_asterisk(self, clusters, event_attributes):
         # main loop to get asterisk
         # abstractions[message_length] = {cluster_id: abstraction, ...}
         abstractions = {}
-        for message_length, clusters in self.clusters.items():
+        for message_length, clusters in clusters.items():
             abstraction = {}
             for cluster_id, cluster in clusters.items():
                 candidate = []
                 for node in cluster['nodes']:
-                    message = self.event_attributes[node]['message'].split()
+                    message = event_attributes[node]['message'].split()
                     candidate.append(message)
 
                 abstraction[cluster_id] = {'abstraction':  self.__get_asterisk(candidate),
@@ -152,55 +148,58 @@ class LogAbstraction(object):
 
         return abstractions
 
-    def __get_final_abstraction(self, abstractions):
+    def __get_final_abstraction(self, abstractions, event_attributes, parsed_logs):
         # restart abstraction id from 0, get abstraction and its log ids
+        final_abstractions = {}
         abstraction_id = 0
         for message_length, abstraction in abstractions.items():
             # get log ids per cluster
             for cluster_id, cluster in abstraction.items():
                 log_ids = []
                 for node in cluster['nodes']:
-                    log_ids.extend(self.event_attributes[node]['member'])
+                    log_ids.extend(event_attributes[node]['member'])
 
                 # get raw logs per cluster (except the main message)
                 candidate = []
                 for log_id in log_ids:
-                    parsed_logs = self.parsed_logs[log_id]
+                    parsed = parsed_logs[log_id]
                     values = []
-                    for label, value in parsed_logs.items():
+                    for label, value in parsed.items():
                         if label != 'message':
                             values.extend(value.split())
                     candidate.append(values)
 
                 # get asterisk and set final abstraction
                 abstraction_str = self.__get_asterisk(candidate)
-                self.abstractions[abstraction_id] = {
+                final_abstractions[abstraction_id] = {
                     'abstraction': abstraction_str + ' ' + cluster['abstraction'],
                     'log_id': log_ids
                 }
                 abstraction_id += 1
 
-    def get_abstraction(self):
+        return final_abstractions
+
+    def get_abstraction(self, log_file):
+        # parsing logs
+        parsed_logs, raw_logs = self.parser.parse_logs(log_file)
+
         # get clusters and event attributes
         # self.clusters[message_length] = {cluster_id: {'nodes': list, 'check': bool}, ...}
-        log_clustering = LogClustering(self.log_file)
-        self.clusters = log_clustering.get_clustering()
-        self.event_attributes = log_clustering.event_attributes
-        self.parsed_logs = log_clustering.parsed_logs
-        self.raw_logs = log_clustering.raw_logs
+        log_clustering = LogClustering(parsed_logs, raw_logs)
+        clusters = log_clustering.get_clustering()
+        event_attributes = log_clustering.event_attributes
 
         # get abstraction
-        abstractions = self.__get_all_asterisk()
-        self.__get_final_abstraction(abstractions)
+        abstractions = self.__get_all_asterisk(clusters, event_attributes)
+        final_abstractions = self.__get_final_abstraction(abstractions, event_attributes, parsed_logs)
 
-        # self.abstractions[abstraction_id] = {'abstraction': str, 'log_id': [int, ...]}
-        return self.abstractions
+        # final_abstractions[abstraction_id] = {'abstraction': str, 'log_id': [int, ...]}
+        return final_abstractions, raw_logs
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/auth.log'
-    log_abstraction = LogAbstraction(logfile)
-    abstraction_results = log_abstraction.get_abstraction()
-    rawlogs = log_abstraction.raw_logs
+    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
+    log_abstraction = LogAbstraction()
+    abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
 
     for abs_id, abs_data in abstraction_results.items():
         print(abs_id, abs_data['abstraction'])
