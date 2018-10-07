@@ -4,13 +4,13 @@ from pylogabstract.parser.model.config import Config
 
 
 class Parser(object):
-    def __init__(self, log_file):
-        self.log_file = log_file
-        self.raw_logs = {}
+    def __init__(self):
         self.model = None
         self.config = None
         self.master_label = {}
-        self.parsed_logs = OrderedDict()
+
+        self.__load_pretrained_model()
+        self.__load_label()
 
     def __load_pretrained_model(self):
         # create instance of config
@@ -32,7 +32,7 @@ class Parser(object):
             ner_label, final_label = line_split[0], line_split[1]
             labels[ner_label] = final_label.rstrip()
 
-        return labels
+        self.master_label = labels
 
     def __get_per_entity(self, words_raw, ner_label):
         # one entity can contain one or more words
@@ -59,27 +59,27 @@ class Parser(object):
 
         return final_entity
 
-    def parse_logs(self):
+    def parse_logs(self, log_file):
         # parse log files using pretrained model
-        self.__load_pretrained_model()
-        self.master_label = self.__load_label()
-        with open(self.log_file) as f:
+        raw_logs = {}
+        parsed_logs = OrderedDict()
+        with open(log_file) as f:
             for line_index, line in enumerate(f):
-                self.raw_logs[line_index] = line
+                raw_logs[line_index] = line
 
                 words_raw = line.strip().split()
                 ner_label = self.model.predict(words_raw)
 
                 parsed = self.__get_per_entity(words_raw, ner_label)
-                self.parsed_logs[line_index] = parsed
+                parsed_logs[line_index] = parsed
 
-        return self.parsed_logs
+        return parsed_logs, raw_logs
 
 
 if __name__ == "__main__":
     logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
-    parser = Parser(logfile)
-    result = parser.parse_logs()
+    parser = Parser()
+    parsed_result, raw_results = parser.parse_logs(logfile)
 
-    # for line_id, parsed_entry in result.items():
-    #     print(line_id, parsed_entry)
+    for line_id, parsed_entry in parsed_result.items():
+        print(line_id, parsed_entry)
