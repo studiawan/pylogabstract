@@ -1,25 +1,14 @@
-from collections import OrderedDict, defaultdict
-from pylogabstract.parser.parser import Parser
+from collections import defaultdict
 
 
 class Preprocess(object):
-    def __init__(self, log_file):
-        self.log_file = log_file
-        self.raw_logs = {}
-        self.parsed_logs = OrderedDict()
+    def __init__(self, parsed_logs, raw_logs):
+        self.parsed_logs = parsed_logs
+        self.raw_logs = raw_logs
         self.event_attributes = {}
         self.message_length_group = defaultdict(list)
 
-    def __get_events(self):
-        # parse logs
-        parser = Parser(self.log_file)
-        self.parsed_logs = parser.parse_logs()
-        self.raw_logs = parser.raw_logs
-
     def get_unique_events(self):
-        # get parsed logs
-        self.__get_events()
-
         # get graph event_attributes
         unique_events_only = []
         unique_event_id = 0
