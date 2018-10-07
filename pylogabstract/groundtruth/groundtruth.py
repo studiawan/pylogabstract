@@ -5,6 +5,7 @@ from configparser import ConfigParser
 from collections import defaultdict
 from pylogabstract.preprocess.preprocess import Preprocess
 from pylogabstract.output.output import Output
+from pylogabstract.parser.parser import Parser
 
 
 class GroundTruth(object):
@@ -13,6 +14,9 @@ class GroundTruth(object):
         self.datasets_config_file = datasets_config_file
         self.wordlist_dir = wordlist_dir
         self.configurations = {}
+
+        # initiate parser
+        self.parser = Parser()
 
     @staticmethod
     def __check_path(path):
@@ -50,9 +54,6 @@ class GroundTruth(object):
                 options[name] = value
             self.configurations[section_name] = options
 
-        # check path for labeled directory
-        self.__check_path(self.configurations[self.dataset]['labeled_dir'])
-
     def __read_wordlist(self, log_type):
         # read word list of particular log type for initial abstraction
         if self.wordlist_dir:
@@ -73,10 +74,13 @@ class GroundTruth(object):
 
         return wordlist
 
-    @staticmethod
-    def __get_preprocessed_logs(log_file):
-        preprocess = Preprocess(log_file)
-        raw_logs = preprocess.raw_logs
+    def __get_preprocessed_logs(self, log_file):
+        # parse log files
+        parsed_logs, raw_logs = self.parser.parse_logs(log_file)
+
+        # preprocessing
+        preprocess = Preprocess(parsed_logs, raw_logs)
+        preprocess.get_unique_events()
         message_length_group = preprocess.message_length_group
         event_attributes = preprocess.event_attributes
 
@@ -92,19 +96,18 @@ class GroundTruth(object):
         groups = defaultdict(list)
         for message_length, unique_event_id in message_length_group.items():
             for event_id in unique_event_id:
-                for line_ids in event_attributes[event_id]['member']:
-                    for line_id in line_ids:
-                        log_lower = raw_logs[line_id].lower().strip()
-                        flag = True
-                        for index, label in enumerate(wordlist):
-                            if label in log_lower:
-                                groups[index].append(line_id)
-                                flag = False
-                                break
+                for line_id in event_attributes[event_id]['member']:
+                    log_lower = raw_logs[line_id].lower().strip()
+                    flag = True
+                    for index, label in enumerate(wordlist):
+                        if label in log_lower:
+                            groups[index].append(line_id)
+                            flag = False
+                            break
 
-                        if flag:
-                            print(log_lower)
-                            groups[-1].append(line_id)
+                    if flag:
+                        print(log_lower)
+                        groups[-1].append(line_id)
 
         return groups, raw_logs
 
@@ -158,7 +161,7 @@ class GroundTruth(object):
         abstraction_withid = {}
         for abstraction_id, abstraction in abstractions.items():
             abstraction_withid[abstraction_id] = abstraction['abstraction']
-            for line_id in abstraction['original_id']:
+            for line_id in abstraction['log_id']:
                 lineid_abstractionid[line_id] = abstraction_id
 
         # get directory
@@ -176,7 +179,7 @@ class GroundTruth(object):
     def get_ground_truth(self):
         # initialization
         self.__read_configuration()
-        logtypes = self.configurations[self.dataset + '-logtype']
+        logtypes = self.configurations[self.dataset + '-logtype']['logtype']
 
         # if logtypes is string, then convert it to list
         if isinstance(logtypes, str):
@@ -191,21 +194,24 @@ class GroundTruth(object):
                 file_list = self.configurations[self.dataset][logtype]
 
             # set group/cluster label for each line in a log file
+            wordlist = self.__read_wordlist(logtype)
             for filename in file_list:
-                # note that file extension is removed
+                print('Processing', filename, '...')
+                
+                # set abstraction label per group of message length
                 log_file = os.path.join(self.configurations[self.dataset]['base_dir'], filename)
-                wordlist = self.__read_wordlist(logtype)
                 groups, raw_logs = self.__set_abstraction_label(log_file, wordlist)
 
                 # get abstraction for each group/cluster
                 abstractions = self.__get_perabstraction(groups, raw_logs)
 
-                # write per abstraction
-                perabstraction_file = os.path.join(self.configurations[self.dataset]['perabstraction_dir'], filename)
-                Output.write_perabstraction(abstractions, raw_logs, perabstraction_file)
-
                 # save ground truth
                 self.__save_groundtruth(abstractions, filename)
+
+                # write per abstraction
+                self.__check_path(self.configurations[self.dataset]['perabstraction_dir'])
+                perabstraction_file = os.path.join(self.configurations[self.dataset]['perabstraction_dir'], filename)
+                Output.write_perabstraction(abstractions, raw_logs, perabstraction_file)
 
 
 if __name__ == '__main__':
