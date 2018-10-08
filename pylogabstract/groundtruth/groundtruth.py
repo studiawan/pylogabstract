@@ -90,26 +90,35 @@ class GroundTruth(object):
         # preprocessing
         raw_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
 
-        # label each log line
-        # note that write to labeled file is not ordered by line id anymore
-        # as the process is based on message length group
-        groups = defaultdict(list)
+        # label each log line based on pre-defined wordlist
+        groups = {}
         for message_length, unique_event_id in message_length_group.items():
+            temp_group = defaultdict(list)
             for event_id in unique_event_id:
                 for line_id in event_attributes[event_id]['member']:
                     log_lower = raw_logs[line_id].lower().strip()
                     flag = True
                     for index, label in enumerate(wordlist):
                         if label in log_lower:
-                            groups[index].append(line_id)
+                            temp_group[index].append(line_id)
                             flag = False
                             break
 
                     if flag:
                         print(log_lower)
-                        groups[-1].append(line_id)
+                        temp_group[-1].append(line_id)
 
-        return groups, raw_logs
+            groups[message_length] = temp_group
+
+        # convert to abstraction_id: line_id
+        final_groups = {}
+        final_groups_id = 0
+        for message_length, all_group in groups.items():
+            for index, group in all_group.items():
+                final_groups[final_groups_id] = group
+                final_groups_id += 1
+
+        return final_groups, raw_logs
 
     @staticmethod
     def __get_asterisk(candidate):
