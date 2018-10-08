@@ -3,6 +3,7 @@ import errno
 import csv
 from configparser import ConfigParser
 from pylogabstract.abstraction.abstraction import LogAbstraction
+from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
 
 
@@ -13,6 +14,9 @@ class Experiment(object):
         self.config_file = config_file
         self.configuration = {}
         self.files = {}
+
+        # initiate abstraction
+        self.log_abstraction = LogAbstraction()
 
     @staticmethod
     def __check_path(path):
@@ -25,9 +29,14 @@ class Experiment(object):
 
     def __read_config(self):
         # read configuration file to run an experiment based on a specific method and a dataset
+        if self.config_file:
+            config_path = self.config_file
+        else:
+            current_path = os.path.dirname(os.path.realpath(__file__))
+            config_path = os.path.join(current_path, self.config_file)
+
+        # read configuration and save to dictionary
         parser = ConfigParser()
-        current_path = os.path.dirname(os.path.realpath(__file__))
-        config_path = os.path.join(current_path, self.config_file)
         parser.read(config_path)
 
         for section_name in parser.sections():
@@ -78,7 +87,19 @@ class Experiment(object):
                                                      self.configuration['experiments']['evaluation_file'])
 
     @staticmethod
-    def __get_evaluation_metrics():
+    def __convert_to_lineid_abstractionid(abstractions):
+        lineid_abstractionid = {}
+        for abstraction_id, abstraction in abstractions.items():
+            for lineid in abstraction['log_id']:
+                lineid_abstractionid[lineid] = abstraction_id
+
+        return lineid_abstractionid
+
+    @staticmethod
+    def __get_evaluation_metrics(groundtruth_file, prediction):
+        # groundtruth and prediction has the same format= line_id: abstraction_id
+        groundtruth = AbstractionUtility.read_json(groundtruth_file)
+        print(groundtruth, prediction)
         precision, recall, f1, accuracy = 0., 0., 0., 0.
 
         metrics = {'precision': precision,
@@ -87,12 +108,8 @@ class Experiment(object):
                    'accuracy': accuracy}
         return metrics
 
-    @staticmethod
-    def __run_pylogabstract(log_path):
-        log_abstraction = LogAbstraction(log_path)
-        abstractions = log_abstraction.get_abstraction()
-        raw_logs = log_abstraction.raw_logs
-
+    def __run_pylogabstract(self, log_path):
+        abstractions, raw_logs = self.log_abstraction.get_abstraction(log_path)
         return abstractions, raw_logs
 
     def __get_abstraction(self, filename, properties):
@@ -103,15 +120,18 @@ class Experiment(object):
             if self.method == 'pylogabstract':
                 abstractions, raw_logs = self.__run_pylogabstract(properties['log_path'])
 
-        # update abstraction id based on ground truth
-        # abstractions = AbstractionUtility.get_abstractionid_from_groundtruth()
-
         # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
         Output.write_perabstraction(abstractions, raw_logs, properties['perabstraction_path'])
 
+        # update abstraction id based on ground truth and convert the format to line_id: abstraction_id
+        abstractions = AbstractionUtility.get_abstractionid_from_groundtruth(properties['abstraction_withid_path'],
+                                                                             abstractions)
+        lineid_abstractionid_prediction = self.__convert_to_lineid_abstractionid(abstractions)
+
         # get evaluation metrics
-        metrics = self.__get_evaluation_metrics()
+        metrics = self.__get_evaluation_metrics(properties['lineid_abstractionid_path'],
+                                                lineid_abstractionid_prediction)
         evaluation_metrics = (filename, metrics['precision'], metrics['recall'], metrics['f1'], metrics['accuracy'])
 
         return evaluation_metrics
@@ -141,7 +161,7 @@ class Experiment(object):
 if __name__ == '__main__':
     abstraction_method = 'pylogabstract'
     dataset_name = 'casper-rw'
-    conf_file = 'abstraction.conf'
+    conf_file = ''
 
     experiment = Experiment(abstraction_method, dataset_name, conf_file)
     experiment.run_abstraction_serial()
