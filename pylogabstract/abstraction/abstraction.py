@@ -114,6 +114,8 @@ class LogAbstraction(object):
 
                     else:
                         not_merge_id.extend([cluster_id1, cluster_id2])
+                else:
+                    not_merge_id.extend([cluster_id1, cluster_id2])
 
         # for cluster id that not in checked_cluster_id and checked_parent_id
         not_merge_id = set(not_merge_id)
