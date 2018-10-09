@@ -44,7 +44,11 @@ class LogClustering(object):
     def __check_weight(self, message_length, graph, nodes):
         # separate two nodes if edge weight < 0.5
         all_weight = nx.get_edge_attributes(graph, 'weight')
-        weight = all_weight[(nodes[0], nodes[1])]
+        try:
+            weight = all_weight[(nodes[0], nodes[1])]
+        except KeyError:
+            weight = all_weight[(nodes[1], nodes[0])]
+
         if weight < 0.5:
             status = True
         else:
