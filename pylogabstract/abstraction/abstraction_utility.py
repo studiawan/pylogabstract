@@ -10,7 +10,7 @@ class AbstractionUtility(object):
 
         # change json key string to int
         converted_data = {}
-        for key, value in data.iteritems():
+        for key, value in data.items():
             converted_data[int(key)] = value
 
         return converted_data
