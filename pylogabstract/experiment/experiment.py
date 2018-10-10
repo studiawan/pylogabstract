@@ -33,7 +33,7 @@ class Experiment(object):
             config_path = self.config_file
         else:
             current_path = os.path.dirname(os.path.realpath(__file__))
-            config_path = os.path.join(current_path, self.config_file)
+            config_path = os.path.join(current_path, 'abstraction.conf')
 
         # read configuration and save to dictionary
         parser = ConfigParser()
@@ -77,7 +77,8 @@ class Experiment(object):
             # get ground truth for each file
             properties = {}
             for key, value in self.configuration['abstraction_ground_truth'].items():
-                properties[key] = os.path.join(dataset_path, value, filename)
+                properties[key] = os.path.join(self.configuration['datasets']['dataset_path'], self.dataset,
+                                               value, filename)
 
             # update files dictionary
             self.files[filename].update(properties)
@@ -116,9 +117,8 @@ class Experiment(object):
         # run experiment: get abstraction
         abstractions = {}
         raw_logs = {}
-        if filename != 'evaluation_file':
-            if self.method == 'pylogabstract':
-                abstractions, raw_logs = self.__run_pylogabstract(properties['log_path'])
+        if self.method == 'pylogabstract':
+            abstractions, raw_logs = self.__run_pylogabstract(properties['log_path'])
 
         # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
@@ -151,8 +151,10 @@ class Experiment(object):
 
         # run the experiment
         for filename, properties in self.files.items():
-            metrics = self.__get_abstraction(filename, properties)
-            writer.writerow(metrics)
+            if filename != 'evaluation_file':
+                print('Processing', filename, '...')
+                metrics = self.__get_abstraction(filename, properties)
+                writer.writerow(metrics)
 
         # close evaluation file
         f.close()
@@ -160,7 +162,9 @@ class Experiment(object):
 
 if __name__ == '__main__':
     abstraction_method = 'pylogabstract'
-    dataset_name = 'casper-rw'
+    dataset_list = ['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal',
+                    'dfrws-2016', 'honeynet-challenge5', 'honeynet-challenge7']
+    dataset_name = dataset_list[0]
     conf_file = ''
 
     experiment = Experiment(abstraction_method, dataset_name, conf_file)
