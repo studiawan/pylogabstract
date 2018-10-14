@@ -69,6 +69,17 @@ class LogAbstraction(object):
 
         return parent_abstraction, child_abstraction, parent_id, child_id
 
+    @staticmethod
+    def __get_partial_logs(nodes, event_attributes, parsed_logs, raw_logs):
+        partial_parsed_logs = OrderedDict()
+        partial_raw_logs = {}
+        for node in nodes:
+            for line_index in event_attributes[node]['member']:
+                partial_parsed_logs[line_index] = parsed_logs[line_index]
+                partial_raw_logs[line_index] = raw_logs[line_index]
+
+        return partial_parsed_logs, partial_raw_logs
+
     def __merge_abstraction(self, abstractions):
         checked_abstractions = {}
         cluster_id = 0
@@ -76,6 +87,7 @@ class LogAbstraction(object):
         checked_parent_id = []
         valid_combinations = []
         not_merge_id = []
+        abstractionstr_abstractionid = {}
 
         # get abstraction that will not be checked (merged)
         for original_cluster_id, abstraction in abstractions.items():
@@ -120,22 +132,32 @@ class LogAbstraction(object):
                     # merge abstractions
                     if merge:
                         if (parent_id != -1) and (child_id != -1):
-                            checked_abstractions[cluster_id] = {
-                                'abstraction': abstractions[parent_id]['abstraction'],
-                                'nodes': abstractions[cluster_id1]['nodes'] + abstractions[cluster_id2]['nodes']
-                            }
+                            if abstractions[parent_id]['abstraction'] in abstractionstr_abstractionid.keys():
+                                existing_id = abstractionstr_abstractionid[abstractions[parent_id]['abstraction']]
+                                checked_abstractions[existing_id]['nodes'].extend(abstractions[child_id]['nodes'])
+
+                            else:
+                                checked_abstractions[cluster_id] = {
+                                    'abstraction': abstractions[parent_id]['abstraction'],
+                                    'nodes': abstractions[cluster_id1]['nodes'] + abstractions[cluster_id2]['nodes']
+                                }
+                                abstractionstr_abstractionid[abstractions[parent_id]['abstraction']] = cluster_id
+                                cluster_id += 1
+
                             checked_cluster_id.append(child_id)
                             checked_parent_id.append(parent_id)
-                            cluster_id += 1
+
                         else:
                             not_merge_id.extend([cluster_id1, cluster_id2])
 
                     else:
                         not_merge_id.extend([cluster_id1, cluster_id2])
+
                 else:
                     not_merge_id.extend([cluster_id1, cluster_id2])
 
         # for cluster id that not in checked_cluster_id and checked_parent_id
+        # check with set operations?
         not_merge_id = set(not_merge_id)
         for index in not_merge_id:
             if (index not in checked_cluster_id) and (index not in checked_parent_id):
@@ -146,17 +168,6 @@ class LogAbstraction(object):
                 cluster_id += 1
 
         return checked_abstractions
-
-    @staticmethod
-    def __get_partial_logs(nodes, event_attributes, parsed_logs, raw_logs):
-        partial_parsed_logs = OrderedDict()
-        partial_raw_logs = {}
-        for node in nodes:
-            for line_index in event_attributes[node]['member']:
-                partial_parsed_logs[line_index] = parsed_logs[line_index]
-                partial_raw_logs[line_index] = raw_logs[line_index]
-
-        return partial_parsed_logs, partial_raw_logs
 
     def __get_all_asterisk(self, clusters, event_attributes, parsed_logs, raw_logs):
         # main loop to get asterisk
@@ -188,6 +199,10 @@ class LogAbstraction(object):
 
             # check merge-possible abstraction
             # abstractions[message_length] = self.__merge_abstraction(abstraction)
+            merge_results = self.__merge_abstraction(abstraction)
+            for k, v in merge_results.items():
+                print(k, v)
+            print('---')
 
         return abstractions
 
