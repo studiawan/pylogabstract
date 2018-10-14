@@ -128,6 +128,9 @@ class LogAbstraction(object):
                         elif (word1 != word2) and (word1 != '*') and (word2 != '*'):
                             merge = False
                             break
+                        elif (word1 != word2) and (word1 != '*') and (word2 == '*'):
+                            merge = False
+                            break
 
                     # merge abstractions
                     if merge:
@@ -198,11 +201,7 @@ class LogAbstraction(object):
                                                'check': cluster['check']}
 
             # check merge-possible abstraction
-            # abstractions[message_length] = self.__merge_abstraction(abstraction)
-            merge_results = self.__merge_abstraction(abstraction)
-            for k, v in merge_results.items():
-                print(k, v)
-            print('---')
+            abstractions[message_length] = self.__merge_abstraction(abstraction)
 
         return abstractions
 
@@ -220,6 +219,7 @@ class LogAbstraction(object):
 
                 # get raw logs per cluster (except the main message)
                 candidates = defaultdict(list)
+                candidates_log_ids = defaultdict(list)
                 for log_id in log_ids:
                     parsed = parsed_logs[log_id]
                     values = []
@@ -231,13 +231,14 @@ class LogAbstraction(object):
                             values_length += len(value_split)
 
                     candidates[values_length].append(values)
+                    candidates_log_ids[values_length].append(log_id)
 
                 # get asterisk and set final abstraction
                 for label_length, candidate in candidates.items():
                     abstraction_str = self.__get_asterisk(candidate)
                     final_abstractions[abstraction_id] = {
                         'abstraction': abstraction_str + ' ' + cluster['abstraction'],
-                        'log_id': log_ids   # CHECK AGAIN, not all log_ids
+                        'log_id': candidates_log_ids[label_length]
                     }
                     abstraction_id += 1
 
