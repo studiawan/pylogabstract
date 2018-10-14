@@ -1,7 +1,10 @@
 from itertools import combinations
-from pylogabstract.clustering.clustering import LogClustering
+from collections import defaultdict, OrderedDict
+# from pylogabstract.clustering.clustering import LogClustering
+from pylogabstract.clustering.recursion_clustering import LogClustering
 from pylogabstract.preprocess.hamming_similarity import HammingSimilarity
 from pylogabstract.parser.parser import Parser
+# from pylogabstract.output.output import Output
 
 
 class LogAbstraction(object):
@@ -47,14 +50,24 @@ class LogAbstraction(object):
             if word2 == '*':
                 total2 += 1
 
+        parent_id, child_id = -1, -1
+        parent_abstraction, child_abstraction = [], []
         if total1 > total2:
             parent_id = cluster_id1
             child_id = cluster_id2
-        else:
+            parent_abstraction = abstraction1
+            child_abstraction = abstraction2
+        elif total1 < total2:
             parent_id = cluster_id2
             child_id = cluster_id1
+            parent_abstraction = abstraction2
+            child_abstraction = abstraction1
+        elif (total1 == total2) and (total1 > 0) and (total2 > 0):
+            parent_id, child_id = -1, -1
+            parent_abstraction = abstraction1
+            child_abstraction = abstraction2
 
-        return parent_id, child_id
+        return parent_abstraction, child_abstraction, parent_id, child_id
 
     def __merge_abstraction(self, abstractions):
         checked_abstractions = {}
@@ -88,13 +101,17 @@ class LogAbstraction(object):
                     abstraction1 = abstractions[cluster_id1]['abstraction'].split()
                     abstraction2 = abstractions[cluster_id2]['abstraction'].split()
 
+                    # check parent and child abstraction
+                    parent_abstraction, child_abstraction, parent_id, child_id = \
+                        self.__check_total_asterisk(abstraction1, abstraction2, cluster_id1, cluster_id2)
+
                     # check for merge
                     # once merge = False, it will not continue checking
                     merge = False
-                    for word1, word2 in zip(abstraction1, abstraction2):
+                    for word1, word2 in zip(parent_abstraction, child_abstraction):
                         if word1 == word2:
                             merge = True
-                        elif (word1 != word2) and (word1 == '*' or word2 == '*'):
+                        elif (word1 != word2) and (word1 == '*'):
                             merge = True
                         elif (word1 != word2) and (word1 != '*') and (word2 != '*'):
                             merge = False
@@ -102,15 +119,16 @@ class LogAbstraction(object):
 
                     # merge abstractions
                     if merge:
-                        parent_id, child_id = self.__check_total_asterisk(abstraction1, abstraction2,
-                                                                          cluster_id1, cluster_id2)
-                        checked_abstractions[cluster_id] = {
-                            'abstraction': abstractions[parent_id]['abstraction'],
-                            'nodes': abstractions[cluster_id1]['nodes'] + abstractions[cluster_id2]['nodes']
-                        }
-                        checked_cluster_id.append(child_id)
-                        checked_parent_id.append(parent_id)
-                        cluster_id += 1
+                        if (parent_id != -1) and (child_id != -1):
+                            checked_abstractions[cluster_id] = {
+                                'abstraction': abstractions[parent_id]['abstraction'],
+                                'nodes': abstractions[cluster_id1]['nodes'] + abstractions[cluster_id2]['nodes']
+                            }
+                            checked_cluster_id.append(child_id)
+                            checked_parent_id.append(parent_id)
+                            cluster_id += 1
+                        else:
+                            not_merge_id.extend([cluster_id1, cluster_id2])
 
                     else:
                         not_merge_id.extend([cluster_id1, cluster_id2])
@@ -129,7 +147,18 @@ class LogAbstraction(object):
 
         return checked_abstractions
 
-    def __get_all_asterisk(self, clusters, event_attributes):
+    @staticmethod
+    def __get_partial_logs(nodes, event_attributes, parsed_logs, raw_logs):
+        partial_parsed_logs = OrderedDict()
+        partial_raw_logs = {}
+        for node in nodes:
+            for line_index in event_attributes[node]['member']:
+                partial_parsed_logs[line_index] = parsed_logs[line_index]
+                partial_raw_logs[line_index] = raw_logs[line_index]
+
+        return partial_parsed_logs, partial_raw_logs
+
+    def __get_all_asterisk(self, clusters, event_attributes, parsed_logs, raw_logs):
         # main loop to get asterisk
         # abstractions[message_length] = {cluster_id: abstraction, ...}
         abstractions = {}
@@ -141,17 +170,30 @@ class LogAbstraction(object):
                     message = event_attributes[node]['message'].split()
                     candidate.append(message)
 
-                abstraction[cluster_id] = {'abstraction':  self.__get_asterisk(candidate),
-                                           'nodes': cluster['nodes'],
-                                           'check': cluster['check']}
+                asterisk = self.__get_asterisk(candidate)
+                check_asterisk = set(asterisk.replace(' ', ''))
+
+                # run clustering again if abstraction is all asterisk, such as * * * * *
+                if check_asterisk == {'*'}:
+                    partial_parsed_logs, partial_raw_logs = \
+                        self.__get_partial_logs(cluster['nodes'], event_attributes, parsed_logs, raw_logs)
+                    log_clustering = LogClustering(partial_parsed_logs, partial_raw_logs)
+                    sub_cluster = log_clustering.get_clustering()
+                    self.__get_all_asterisk(sub_cluster, event_attributes, parsed_logs, raw_logs)
+
+                else:
+                    abstraction[cluster_id] = {'abstraction': asterisk,
+                                               'nodes': cluster['nodes'],
+                                               'check': cluster['check']}
 
             # check merge-possible abstraction
-            abstractions[message_length] = self.__merge_abstraction(abstraction)
+            # abstractions[message_length] = self.__merge_abstraction(abstraction)
 
         return abstractions
 
     def __get_final_abstraction(self, abstractions, event_attributes, parsed_logs):
         # restart abstraction id from 0, get abstraction and its log ids
+        # in this method, we include other fields such as timestamp, hostname, ip address, etc in abstraction
         final_abstractions = {}
         abstraction_id = 0
         for message_length, abstraction in abstractions.items():
@@ -162,22 +204,27 @@ class LogAbstraction(object):
                     log_ids.extend(event_attributes[node]['member'])
 
                 # get raw logs per cluster (except the main message)
-                candidate = []
+                candidates = defaultdict(list)
                 for log_id in log_ids:
                     parsed = parsed_logs[log_id]
                     values = []
+                    values_length = 0
                     for label, value in parsed.items():
                         if label != 'message':
-                            values.extend(value.split())
-                    candidate.append(values)
+                            value_split = value.split()
+                            values.extend(value_split)
+                            values_length += len(value_split)
+
+                    candidates[values_length].append(values)
 
                 # get asterisk and set final abstraction
-                abstraction_str = self.__get_asterisk(candidate)
-                final_abstractions[abstraction_id] = {
-                    'abstraction': abstraction_str + ' ' + cluster['abstraction'],
-                    'log_id': log_ids
-                }
-                abstraction_id += 1
+                for label_length, candidate in candidates.items():
+                    abstraction_str = self.__get_asterisk(candidate)
+                    final_abstractions[abstraction_id] = {
+                        'abstraction': abstraction_str + ' ' + cluster['abstraction'],
+                        'log_id': log_ids   # CHECK AGAIN, not all log_ids
+                    }
+                    abstraction_id += 1
 
         return final_abstractions
 
@@ -192,19 +239,21 @@ class LogAbstraction(object):
         event_attributes = log_clustering.event_attributes
 
         # get abstraction
-        abstractions = self.__get_all_asterisk(clusters, event_attributes)
-        final_abstractions = self.__get_final_abstraction(abstractions, event_attributes, parsed_logs)
+        abstractions = self.__get_all_asterisk(clusters, event_attributes, parsed_logs, raw_logs)
+        # final_abstractions = self.__get_final_abstraction(abstractions, event_attributes, parsed_logs)
 
         # final_abstractions[abstraction_id] = {'abstraction': str, 'log_id': [int, ...]}
-        return final_abstractions, raw_logs
+        # return final_abstractions, raw_logs
+        return abstractions, raw_logs
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/debug'
+    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/syslog.0'
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
-
-    for abs_id, abs_data in abstraction_results.items():
-        print(abs_id, abs_data['abstraction'])
-        for logid in abs_data['log_id']:
-            print(rawlogs[logid].rstrip())
-        print('-----')
+    # Output.write_perabstraction(abstraction_results, rawlogs, 'results.txt')
+    #
+    # for abs_id, abs_data in abstraction_results.items():
+    #     print(abs_id, abs_data['abstraction'])
+    #     for logid in abs_data['log_id']:
+    #         print(rawlogs[logid].rstrip())
+    #     print('-----')
