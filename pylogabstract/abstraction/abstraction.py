@@ -4,7 +4,7 @@ from collections import defaultdict, OrderedDict
 from pylogabstract.clustering.recursion_clustering import LogClustering
 from pylogabstract.preprocess.hamming_similarity import HammingSimilarity
 from pylogabstract.parser.parser import Parser
-# from pylogabstract.output.output import Output
+from pylogabstract.output.output import Output
 
 
 class LogAbstraction(object):
@@ -217,27 +217,37 @@ class LogAbstraction(object):
                 for node in cluster['nodes']:
                     log_ids.extend(event_attributes[node]['member'])
 
-                # get raw logs per cluster (except the main message)
+                # get entities from raw logs per cluster (except the main message)
                 candidates = defaultdict(list)
                 candidates_log_ids = defaultdict(list)
+                candidates_messages = defaultdict(list)
                 for log_id in log_ids:
                     parsed = parsed_logs[log_id]
                     values = []
                     values_length = 0
+                    message = []
                     for label, value in parsed.items():
                         if label != 'message':
                             value_split = value.split()
                             values.extend(value_split)
                             values_length += len(value_split)
 
+                        # get the message here
+                        else:
+                            message_split = value.split()
+                            message.append(message_split)
+
+                    # get abstraction candidates and their respective log ids
                     candidates[values_length].append(values)
                     candidates_log_ids[values_length].append(log_id)
+                    candidates_messages[values_length].append(message)
 
-                # get asterisk and set final abstraction
+                # get asterisk for entity and message and then set final abstraction
                 for label_length, candidate in candidates.items():
-                    abstraction_str = self.__get_asterisk(candidate)
+                    entity_abstraction = self.__get_asterisk(candidate)
+                    message_abstraction = self.__get_asterisk(candidates_messages[label_length])
                     final_abstractions[abstraction_id] = {
-                        'abstraction': abstraction_str + ' ' + cluster['abstraction'],
+                        'abstraction': entity_abstraction + ' ' + message_abstraction,
                         'log_id': candidates_log_ids[label_length]
                     }
                     abstraction_id += 1
@@ -256,20 +266,19 @@ class LogAbstraction(object):
 
         # get abstraction
         abstractions = self.__get_all_asterisk(clusters, event_attributes, parsed_logs, raw_logs)
-        # final_abstractions = self.__get_final_abstraction(abstractions, event_attributes, parsed_logs)
+        final_abstractions = self.__get_final_abstraction(abstractions, event_attributes, parsed_logs)
 
         # final_abstractions[abstraction_id] = {'abstraction': str, 'log_id': [int, ...]}
-        # return final_abstractions, raw_logs
-        return abstractions, raw_logs
+        return final_abstractions, raw_logs
 
 if __name__ == '__main__':
     logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/syslog.0'
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
-    # Output.write_perabstraction(abstraction_results, rawlogs, 'results.txt')
-    #
-    # for abs_id, abs_data in abstraction_results.items():
-    #     print(abs_id, abs_data['abstraction'])
-    #     for logid in abs_data['log_id']:
-    #         print(rawlogs[logid].rstrip())
-    #     print('-----')
+    Output.write_perabstraction(abstraction_results, rawlogs, 'results.txt')
+
+    for abs_id, abs_data in abstraction_results.items():
+        print(abs_id, abs_data['abstraction'])
+        for logid in abs_data['log_id']:
+            print(rawlogs[logid].rstrip())
+        print('-----')
