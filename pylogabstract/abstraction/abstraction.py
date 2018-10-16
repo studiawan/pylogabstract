@@ -235,7 +235,7 @@ class LogAbstraction(object):
                         # get the message here
                         else:
                             message_split = value.split()
-                            message.append(message_split)
+                            message.extend(message_split)
 
                     # get abstraction candidates and their respective log ids
                     candidates[values_length].append(values)
@@ -276,7 +276,7 @@ if __name__ == '__main__':
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
     Output.write_perabstraction(abstraction_results, rawlogs, 'results.txt')
-
+    
     for abs_id, abs_data in abstraction_results.items():
         print(abs_id, abs_data['abstraction'])
         for logid in abs_data['log_id']:
