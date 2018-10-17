@@ -9,7 +9,7 @@ from pylogabstract.parser.parser import Parser
 
 
 class LogClustering(object):
-    def __init__(self, parsed_logs, raw_logs):
+    def __init__(self, parsed_logs, raw_logs, partial_message_length_group=None, partial_event_attributes=None):
         self.clusters = defaultdict(dict)
         self.cluster_id = 0
         self.message_length_group = {}
@@ -17,6 +17,8 @@ class LogClustering(object):
         self.preprocess = None
         self.parsed_logs = parsed_logs
         self.raw_logs = raw_logs
+        self.partial_message_length_group = partial_message_length_group
+        self.partial_event_attributes = partial_event_attributes
 
     @staticmethod
     def __convert_to_nodeid_clusterid(partition):
@@ -129,6 +131,14 @@ class LogClustering(object):
 
         return best_cluster
 
+    def __get_partial_unique_events(self, indices):
+        partial_unique_events = []
+        for index, attr in self.event_attributes.items():
+            if index in indices:
+                partial_unique_events.append((index, attr))
+
+        return partial_unique_events
+
     def __get_clusters(self, message_length_group):
         for message_length, group in message_length_group.items():
             # no graph needed as there is only one node
@@ -142,7 +152,8 @@ class LogClustering(object):
 
             # create graph for a particular group
             else:
-                unique_events = self.preprocess.get_partial_unique_events(group)
+                # unique_events = self.preprocess.get_partial_unique_events(group)
+                unique_events = self.__get_partial_unique_events(group)
                 graph_model = CreateGraph(unique_events, self.event_attributes, group)
                 graph = graph_model.create_graph()
 
@@ -164,10 +175,15 @@ class LogClustering(object):
 
     def __run_preprocess(self):
         # preprocess
-        self.preprocess = Preprocess(self.parsed_logs, self.raw_logs)
-        self.preprocess.get_unique_events()
-        self.message_length_group = self.preprocess.message_length_group
-        self.event_attributes = self.preprocess.event_attributes
+        if self.partial_message_length_group is None and self.partial_event_attributes is None:
+            self.preprocess = Preprocess(self.parsed_logs, self.raw_logs)
+            self.preprocess.get_unique_events()
+            self.message_length_group = self.preprocess.message_length_group
+            self.event_attributes = self.preprocess.event_attributes
+
+        else:
+            self.message_length_group = self.partial_message_length_group
+            self.event_attributes = self.partial_event_attributes
 
     def get_clustering(self):
         self.__run_preprocess()
