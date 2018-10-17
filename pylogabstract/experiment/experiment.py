@@ -2,6 +2,7 @@ import os
 import errno
 import csv
 from configparser import ConfigParser
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from pylogabstract.abstraction.abstraction import LogAbstraction
 from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
@@ -84,29 +85,26 @@ class Experiment(object):
             self.files[filename].update(properties)
 
         # evaluation file and directory. to save metrics results such as precision and recall
-        self.files['evaluation_file'] = os.path.join(result_path,
+        self.files['evaluation_file'] = os.path.join(result_path, self.dataset,
                                                      self.configuration['experiments']['evaluation_file'])
-
-    @staticmethod
-    def __convert_to_lineid_abstractionid(abstractions):
-        lineid_abstractionid = {}
-        for abstraction_id, abstraction in abstractions.items():
-            for lineid in abstraction['log_id']:
-                lineid_abstractionid[lineid] = abstraction_id
-
-        return lineid_abstractionid
 
     @staticmethod
     def __get_evaluation_metrics(groundtruth_file, prediction):
         # groundtruth and prediction has the same format= line_id: abstraction_id
         groundtruth = AbstractionUtility.read_json(groundtruth_file)
-        print(groundtruth, prediction)
-        precision, recall, f1, accuracy = 0., 0., 0., 0.
+        groundtruth_list = list(groundtruth.values())
+        prediction_list = list(prediction.values())
 
-        metrics = {'precision': precision,
-                   'recall': recall,
-                   'f1': f1,
-                   'accuracy': accuracy}
+        precision = precision_score(groundtruth_list, prediction_list, average='micro')
+        recall = recall_score(groundtruth_list, prediction_list, average='micro')
+        f1 = f1_score(groundtruth_list, prediction_list, average='micro')
+        accuracy = accuracy_score(groundtruth_list, prediction_list)
+
+        metrics = {'precision': round(precision, 3),
+                   'recall': round(recall, 3),
+                   'f1': round(f1, 3),
+                   'accuracy': round(accuracy, 3)}
+
         return metrics
 
     def __run_pylogabstract(self, log_path):
@@ -125,14 +123,14 @@ class Experiment(object):
         Output.write_perabstraction(abstractions, raw_logs, properties['perabstraction_path'])
 
         # update abstraction id based on ground truth and convert the format to line_id: abstraction_id
-        abstractions = AbstractionUtility.get_abstractionid_from_groundtruth(properties['abstraction_withid_path'],
-                                                                             abstractions)
-        lineid_abstractionid_prediction = self.__convert_to_lineid_abstractionid(abstractions)
+        lineid_abstractionid_prediction = \
+            AbstractionUtility.get_abstractionid_from_groundtruth(properties['abstraction_withid_path'], abstractions)
 
         # get evaluation metrics
         metrics = self.__get_evaluation_metrics(properties['lineid_abstractionid_path'],
                                                 lineid_abstractionid_prediction)
         evaluation_metrics = (filename, metrics['precision'], metrics['recall'], metrics['f1'], metrics['accuracy'])
+        print('p:', metrics['precision'], 'r:', metrics['recall'], 'f1:', metrics['f1'], 'acc:', metrics['accuracy'])
 
         return evaluation_metrics
 
