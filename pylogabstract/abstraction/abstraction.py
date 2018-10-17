@@ -9,6 +9,9 @@ from pylogabstract.output.output import Output
 
 class LogAbstraction(object):
     def __init__(self):
+        self.abstractions_nonmerge = defaultdict(dict)
+        self.abstractions_nonmerge_id = 0
+
         # initiate log parsing
         self.parser = Parser()
 
@@ -73,12 +76,15 @@ class LogAbstraction(object):
     def __get_partial_logs(nodes, event_attributes, parsed_logs, raw_logs):
         partial_parsed_logs = OrderedDict()
         partial_raw_logs = {}
+        partial_event_attributes = {}
         for node in nodes:
             for line_index in event_attributes[node]['member']:
                 partial_parsed_logs[line_index] = parsed_logs[line_index]
                 partial_raw_logs[line_index] = raw_logs[line_index]
 
-        return partial_parsed_logs, partial_raw_logs
+            partial_event_attributes[node] = event_attributes[node]
+
+        return partial_parsed_logs, partial_raw_logs, partial_event_attributes
 
     def __merge_abstraction(self, abstractions):
         checked_abstractions = {}
@@ -172,11 +178,10 @@ class LogAbstraction(object):
 
         return checked_abstractions
 
-    def __get_all_asterisk(self, clusters, event_attributes, parsed_logs, raw_logs):
+    def __get_all_asterisk(self, all_clusters, event_attributes, parsed_logs, raw_logs):
         # main loop to get asterisk
         # abstractions[message_length] = {cluster_id: abstraction, ...}
-        abstractions = {}
-        for message_length, clusters in clusters.items():
+        for message_length, clusters in all_clusters.items():
             abstraction = {}
             for cluster_id, cluster in clusters.items():
                 candidate = []
@@ -189,21 +194,36 @@ class LogAbstraction(object):
 
                 # run clustering again if abstraction is all asterisk, such as * * * * *
                 if check_asterisk == {'*'}:
-                    partial_parsed_logs, partial_raw_logs = \
+                    # get partial data only for the cluster that has ^ asterisk
+                    partial_parsed_logs, partial_raw_logs, partial_event_attributes = \
                         self.__get_partial_logs(cluster['nodes'], event_attributes, parsed_logs, raw_logs)
-                    log_clustering = LogClustering(partial_parsed_logs, partial_raw_logs)
+                    partial_message_length_group = {
+                        message_length: cluster['nodes']
+                    }
+
+                    # clustering again
+                    log_clustering = LogClustering(partial_parsed_logs, partial_raw_logs,
+                                                   partial_message_length_group, partial_event_attributes)
                     sub_cluster = log_clustering.get_clustering()
+
+                    # recursion to get asterisk
                     self.__get_all_asterisk(sub_cluster, event_attributes, parsed_logs, raw_logs)
 
                 else:
-                    abstraction[cluster_id] = {'abstraction': asterisk,
-                                               'nodes': cluster['nodes'],
-                                               'check': cluster['check']}
+                    abstraction[self.abstractions_nonmerge_id] = {'abstraction': asterisk,
+                                                                  'nodes': cluster['nodes'],
+                                                                  'check': cluster['check']}
+                    self.abstractions_nonmerge_id += 1
 
-            # check merge-possible abstraction
-            abstractions[message_length] = self.__merge_abstraction(abstraction)
+            # save all abstraction before merging here
+            self.abstractions_nonmerge[message_length].update(abstraction)
 
-        return abstractions
+    def __run_merge_abstraction(self):
+        merged_abstractions = {}
+        for message_length, abstraction in self.abstractions_nonmerge.items():
+            merged_abstractions[message_length] = self.__merge_abstraction(abstraction)
+
+        return merged_abstractions
 
     def __get_final_abstraction(self, abstractions, event_attributes, parsed_logs):
         # restart abstraction id from 0, get abstraction and its log ids
@@ -255,27 +275,33 @@ class LogAbstraction(object):
         return final_abstractions
 
     def get_abstraction(self, log_file):
+        # initialize abstractions
+        self.abstractions_nonmerge = defaultdict(dict)
+        self.abstractions_nonmerge_id = 0
+
         # parsing logs
         parsed_logs, raw_logs = self.parser.parse_logs(log_file)
 
         # get clusters and event attributes
-        # self.clusters[message_length] = {cluster_id: {'nodes': list, 'check': bool}, ...}
+        # clusters[message_length] = {cluster_id: {'nodes': list, 'check': bool}, ...}
         log_clustering = LogClustering(parsed_logs, raw_logs)
         clusters = log_clustering.get_clustering()
         event_attributes = log_clustering.event_attributes
 
         # get abstraction
-        abstractions = self.__get_all_asterisk(clusters, event_attributes, parsed_logs, raw_logs)
-        final_abstractions = self.__get_final_abstraction(abstractions, event_attributes, parsed_logs)
+        self.__get_all_asterisk(clusters, event_attributes, parsed_logs, raw_logs)
+        merged_abstractions = self.__run_merge_abstraction()
+        final_abstractions = self.__get_final_abstraction(merged_abstractions, event_attributes, parsed_logs)
 
         # final_abstractions[abstraction_id] = {'abstraction': str, 'log_id': [int, ...]}
         return final_abstractions, raw_logs
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/syslog.0'
+    logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/dmesg.3'
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
-    Output.write_perabstraction(abstraction_results, rawlogs, 'results.txt')
+    Output.write_perabstraction(abstraction_results, rawlogs, 'results-perabstraction.txt')
+    Output.write_perline(abstraction_results, rawlogs, 'results-perline.txt')
     
     for abs_id, abs_data in abstraction_results.items():
         print(abs_id, abs_data['abstraction'])
