@@ -21,7 +21,7 @@ class AbstractionUtility(object):
         abstraction_withid = AbstractionUtility.read_json(abstraction_withid_file)
         groundtruth_length = len(abstraction_withid.keys())
 
-        abstractions_edited_id = {}
+        lineid_abstractionid = {}
         for abstraction_id, abstraction in abstractions.items():
             # if abstraction exist in ground truth, get id from dictionary key
             new_id = -1
@@ -35,6 +35,7 @@ class AbstractionUtility(object):
                 groundtruth_length += 1
 
             # set new abstraction id based on ground truth id
-            abstractions_edited_id[new_id] = abstraction
+            for lineid in abstraction['log_id']:
+                lineid_abstractionid[lineid] = new_id
 
-        return abstractions_edited_id
+        return lineid_abstractionid
