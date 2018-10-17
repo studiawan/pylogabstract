@@ -25,7 +25,7 @@ setup(name='pylogabstract',
           'networkx',
           'python-louvain',
           'nltk',
-          'datefinder'
+          'scikit-learn'
       ],
       include_package_data=True,
       zip_safe=False)
