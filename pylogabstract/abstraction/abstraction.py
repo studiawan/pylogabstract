@@ -11,6 +11,7 @@ class LogAbstraction(object):
     def __init__(self):
         self.abstractions_nonmerge = defaultdict(dict)
         self.abstractions_nonmerge_id = 0
+        self.word_check = []
 
         # initiate log parsing
         self.parser = Parser()
@@ -86,6 +87,21 @@ class LogAbstraction(object):
 
         return partial_parsed_logs, partial_raw_logs, partial_event_attributes
 
+    def __check_word(self, word):
+        alphabet_count = 0
+        if word not in self.word_check:
+            for character in word:
+                if character.isalpha():
+                    alphabet_count += 1
+
+            if alphabet_count <= 1:
+                self.word_check.append(word)
+                word = '*'
+        else:
+            word = '*'
+
+        return word
+
     def __merge_abstraction(self, abstractions):
         checked_abstractions = {}
         cluster_id = 0
@@ -126,20 +142,36 @@ class LogAbstraction(object):
                     # check for merge
                     # once merge = False, it will not continue checking
                     merge = False
+                    parent_abstraction_check = []
                     for word1, word2 in zip(parent_abstraction, child_abstraction):
+                        word1_check = self.__check_word(word1)
+                        word2_check = self.__check_word(word2)
+                        parent_abstraction_check.append(word1_check)
+
                         if word1 == word2:
                             merge = True
+
                         elif (word1 != word2) and (word1 == '*'):
                             merge = True
+
                         elif (word1 != word2) and (word1 != '*') and (word2 != '*'):
-                            merge = False
-                            break
+                            if word1_check == word2_check:
+                                merge = True
+                            else:
+                                merge = False
+                                break
+
                         elif (word1 != word2) and (word1 != '*') and (word2 == '*'):
-                            merge = False
-                            break
+                            if word1_check == word2:
+                                merge = True
+                            else:
+                                merge = False
+                                break
 
                     # merge abstractions
                     if merge:
+                        # change asterisk here
+                        abstractions[parent_id]['abstraction'] = ' '.join(parent_abstraction_check)
                         if (parent_id != -1) and (child_id != -1):
                             if abstractions[parent_id]['abstraction'] in abstractionstr_abstractionid.keys():
                                 existing_id = abstractionstr_abstractionid[abstractions[parent_id]['abstraction']]
@@ -297,14 +329,20 @@ class LogAbstraction(object):
         return final_abstractions, raw_logs
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/dmesg.3'
+    logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/debug'
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
     Output.write_perabstraction(abstraction_results, rawlogs, 'results-perabstraction.txt')
     Output.write_perline(abstraction_results, rawlogs, 'results-perline.txt')
-    
-    for abs_id, abs_data in abstraction_results.items():
-        print(abs_id, abs_data['abstraction'])
-        for logid in abs_data['log_id']:
-            print(rawlogs[logid].rstrip())
-        print('-----')
+
+    abstraction_withid_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-abstraction_withid/debug'
+    abstractions_groundtruth_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-lineid_abstractionid/debug'
+    comparison_file = 'compare.txt'
+    Output.write_comparison(abstraction_withid_file, abstractions_groundtruth_file, abstraction_results,
+                            rawlogs, comparison_file)
+
+    # for abs_id, abs_data in abstraction_results.items():
+    #     print(abs_id, abs_data['abstraction'])
+    #     for logid in abs_data['log_id']:
+    #         print(rawlogs[logid].rstrip())
+    #     print('-----')
