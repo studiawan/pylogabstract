@@ -88,15 +88,20 @@ class LogAbstraction(object):
         return partial_parsed_logs, partial_raw_logs, partial_event_attributes
 
     def __check_word(self, word):
-        alphabet_count = 0
         if word not in self.word_check:
+            alphabet_count = 0
+            digit_count = 0
             for character in word:
                 if character.isalpha():
                     alphabet_count += 1
 
-            if alphabet_count <= 1:
+                if character.isdigit():
+                    digit_count += 1
+
+            if alphabet_count <= 1 or digit_count == 1:
                 self.word_check.append(word)
                 word = '*'
+
         else:
             word = '*'
 
@@ -171,8 +176,8 @@ class LogAbstraction(object):
                     # merge abstractions
                     if merge:
                         # change asterisk here
-                        abstractions[parent_id]['abstraction'] = ' '.join(parent_abstraction_check)
                         if (parent_id != -1) and (child_id != -1):
+                            abstractions[parent_id]['abstraction'] = ' '.join(parent_abstraction_check)
                             if abstractions[parent_id]['abstraction'] in abstractionstr_abstractionid.keys():
                                 existing_id = abstractionstr_abstractionid[abstractions[parent_id]['abstraction']]
                                 checked_abstractions[existing_id]['nodes'].extend(abstractions[child_id]['nodes'])
@@ -329,14 +334,15 @@ class LogAbstraction(object):
         return final_abstractions, raw_logs
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/debug'
+    logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/daemon.log'
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
     Output.write_perabstraction(abstraction_results, rawlogs, 'results-perabstraction.txt')
     Output.write_perline(abstraction_results, rawlogs, 'results-perline.txt')
 
-    abstraction_withid_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-abstraction_withid/debug'
-    abstractions_groundtruth_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-lineid_abstractionid/debug'
+    abstraction_withid_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-abstraction_withid/daemon.log'
+    abstractions_groundtruth_file = \
+        '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-lineid_abstractionid/daemon.log'
     comparison_file = 'compare.txt'
     Output.write_comparison(abstraction_withid_file, abstractions_groundtruth_file, abstraction_results,
                             rawlogs, comparison_file)
