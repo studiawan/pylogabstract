@@ -8,27 +8,15 @@ ramdisk:
 allocated new ramdisk:
 move ramdisk from
 dmi 2.3 present.
-acpi: rsdp
-acpi: rsdt
-acpi: facp
-acpi: dsdt
+(r1
+(r0
 acpi: facs
-acpi: ssdt
-acpi: apic
-acpi: boot
 highmem available
 lowmem available
-mapped low ram:
 low ram:
 bootmap
 early reservations) ==> bootmem
-bios data page ==>
-trampoline ==>
-text data bss ==>
-init_pg_table ==>
-bios reserved ==>
-pgtable ==> 
-new ramdisk ==>
+ ==> [
 found smp mp-table at
 zone pfn ranges:
 dma      0x
@@ -51,8 +39,7 @@ used by override
 enabling apic mode:
 using acpi (madt) for smp configuration information
 smp: allowing 4 cpus
-mapped apic to
-mapped ioapic to
+mapped
 pm: registered nosave memory:
 allocating pci resources starting at
 percpu: allocating
@@ -62,14 +49,12 @@ kernel command line:
 enabling fast fpu save and restore
 enabling unmasked simd fpu exception support
 initializing cpu
-pid hash table entries:
+hash table entries:
 tsc: pit calibration confirmed by pmtimer
 tsc: using pmtimer calibration value
 mhz processor
 console: colour vga
 console [
-dentry cache hash table entries:
-inode-cache hash table entries:
 ] memory: 
 virtual kernel memory layout:
 fixmap  : 
@@ -85,8 +70,10 @@ slub: genslabs
 calibrating delay loop
 security framework initialized
 selinux:  disabled at boot.
+pme# disabled
+pme# supported
+pci bridge
 apparmor: apparmor initialized
-mount-cache hash table entries:
 cpu: trace cache: 
 cpu: hyper-threading
 checking 'hlt' instruction
@@ -114,9 +101,12 @@ acpi: interpreter enabled
 acpi: (supports
 acpi: using ioapic for
 acpi: pci root bridge 
-] pci: 
-] cpu: 
-] pci 
+32bit mmio: [
+32bit mmio pref:
+io port:
+] cpu:
+claimed by
+irq routing
 * the chipset may have pm-timer bug
 * this clock source is slow
 * this bug, please use
@@ -138,11 +128,8 @@ pages allocated for
 actual entries
 apparmor: apparmor 
 acpi: rtc can wake
-: iomem range
-: ioport range
-ip route cache hash table entries
-tcp established hash table entries:
-tcp bind hash table entries:
+has been reserved
+could not be reserved
 tcp: hash tables configured
 tcp reno registered
 checking if image is initramfs
@@ -155,14 +142,13 @@ audit: initializing netlink
 highmem bounce pool size:
 hugetlb registered
 vfs: disk quotas
-dquot-cache hash table entries:
 msgmni has been set
 io scheduler
 isapnp: scanning 
 isapnp: no plug
 irq sharing enabled
 ttys0 at i/o
-brd: module loaded
+module loaded
 input: macintosh mouse button emulation
 pnp: ps/2 controller
 pnp: ps/2 appears to have aux port disabled
@@ -184,16 +170,15 @@ edd information not available
 freeing unused kernel memory
 write protecting the kernel 
 at translated set 2 keyboard as
+: transparent bridge
 fuse init
 processor acpi
 usbcore: registered new
 pci int d
 setting latency timer
-ehci host controller
 new usb bus registered
 debug port
 cache line size of
-usb universal host controller interface driver
 usb usb1: configuration
 usb hub found
 , io mem
@@ -203,7 +188,6 @@ no dock devices found
 scsi subsystem initialized
 libata version
 : pci int
-uhci host controller
 , io base
 chosen from
 speed usb device using
@@ -223,10 +207,10 @@ logitech usb trackball as
 usb mass storage support registered
 usb hid core driver
 , max udma/
-: direct-access
+pq:
 : usb hid
 attached scsi generic
-: cd-rom
+attached scsi removable disk
 needs updating - please
 byte hardware sectors
 write protect is off
@@ -234,14 +218,14 @@ mode sense:
 write cache:
 ]  sda1
 b44.c:
-attached scsi
+attached scsi cd-rom
+attached scsi disk
 mmc drive:
 uniform cd-rom driver
 device scan complete
 assuming drive cache:
 ]  sdb:
 ] aufs
-loop: module loaded
 squashfs: version
 kjournald starting.
 internal journal
@@ -285,6 +269,7 @@ hci usb driver
 hci socket layer initialized
 hci device and connection
 core ver
+core version
 registered misc device
 first accessible region
 dma_sb_region_create
@@ -293,11 +278,10 @@ internal vlan enabled
 pages for linear map
 starting manual resume from disk
 usb 0.0 started
-ohci host controller
+host controller
 : ps3rom
 ps3da: ps3da
 is a fujitsu
-'open' host controller
 registered block device major
 usb disconnect,
 initialised: dm-devel
@@ -352,8 +336,7 @@ crash kernel location must be
 swap on /dev
 generic bluetooth usb driver
 ps3_lpm_probe:
-ehci_hcd should always be loaded 
-'enhanced' host controller
+ehci_hcd should always be loaded
 mib of gpu memory
 created ram cache:
 rpc: registered
@@ -384,9 +367,7 @@ link is not ready
 sda: sda1
 allocate port service
 assign_interrupt_mode found msi
-]   io window:
-]   mem window:
-]   prefetch window:
+ window:
 registered nosave memory region:
 nf_conntrack version 
 using parport0
@@ -418,11 +399,12 @@ fusion mpt spi host driver
 lsi corporation
 fusion mpt base driver
 ] (supports
+: supports
 unable to open rtc device
 hash matches device
 ramdisk driver initialized:
 real time clock driver
-boot video device is
+boot video device
 limiting direct pci
 ): initialized
 works better, please notify

@@ -1,13 +1,10 @@
 kernel direct mapping tables up to
 on node 0 totalpages:
 free_area_init_node: node
-dma zone:
-normal zone:
-highmem zone:
+zone:
 acpi: local apic address
 used by override
-mapped apic to
-mapped ioapic to
+mapped
 nr_cpus:
 cpa: page pool initialized 
 cpu0 attaching sched-domain:
@@ -38,7 +35,6 @@ thread shift is
 top of ram:
 memory hole size:
 entering add_active_range
-movable zone:
 time_init: 
 clockevent: decrementer mult
 calibrating delay loop
@@ -51,7 +47,6 @@ hvsi: registered
 kernel:   groups:
 allocate port service
 setting latency timer of device
-dma32 zone:
 detecting calgary via bios
 unable to locate rio grande
 apic timer calibration

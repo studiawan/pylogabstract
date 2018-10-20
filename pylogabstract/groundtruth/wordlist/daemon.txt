@@ -10,11 +10,11 @@ registering hinfo record with values
 server startup complete
 client connected from
 bluetooth daemon
-starting sdp server
+sdp server
 starting experimental netlink support
 failed to find bluetooth netlink family
 can't init plugin
-bridge pan0 created
+bridge pan0
 <info>  starting... 
 eth0: driver is
 found new ethernet device
@@ -61,7 +61,7 @@ dhcpack
 <info>    gateway
 <info>    nameserver
 (ip configure commit)
-joining mdns multicast group on interface
+mdns multicast group on interface
 new relevant interface
 registering new address record
 dhclient: bound to
@@ -70,10 +70,7 @@ dhclient: bound to
 step time server
 failed to register before timeout
 killed by term signal
-bridge pan0 removed
-stopping sdp server
 got sigterm, quitting
-leaving mdns multicast group on interface
 mounted /dev/sda1
 warning: unable to activate console:
 cmdline options:
@@ -86,8 +83,7 @@ received response with invalid source port
 external fuse
 value location for
 instance of invalid non-instantiatable type
-g_signal_emit_valist: assertion
-g_object_unref: assertion
+assertion
 hal disappeared
 disconnected by the system
 disconnected from the system bus
