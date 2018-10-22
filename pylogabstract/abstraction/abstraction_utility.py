@@ -26,7 +26,7 @@ class AbstractionUtility(object):
             # if abstraction exist in ground truth, get id from dictionary key
             new_id = -1
             for groundtruth_id, groundtruth_abstraction in abstraction_withid.items():
-                if abstraction['abstraction'] in groundtruth_abstraction:
+                if abstraction['abstraction'].rstrip() == groundtruth_abstraction:
                     new_id = groundtruth_id
 
             # if not exist, new id is dictionary length + 1
