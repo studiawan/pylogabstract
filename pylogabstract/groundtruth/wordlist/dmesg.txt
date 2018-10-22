@@ -1,14 +1,16 @@
 initializing cgroup subsys
 linux version
 bios-provided physical ram map
-bios-e820:
+(reserved)
+(usable)
 last_pfn =
 kernel direct mapping tables up to
 ramdisk:
 allocated new ramdisk:
 move ramdisk from
 dmi 2.3 present.
-(r1
+(r1 dell
+(r1   dell
 (r0
 acpi: facs
 highmem available
@@ -26,12 +28,11 @@ movable zone start pfn for each node
 active pfn ranges
 on node 0 totalpages:
 free_area_init_node: node
-dma zone:
-normal zone:
-highmem zone:
+zone:
 acpi: pm-timer io port:
 acpi: local apic address
-acpi: lapic (acpi_id
+] enabled)
+] disabled)
 acpi: ioapic
 apic_id 1, version 32, address
 acpi: int_src_ovr
@@ -93,7 +94,7 @@ booting paravirtualized kernel on bare hardware
 ] time: 
 net: registered protocol family
 eisa bus registered 
-acpi: bus type pci registered
+acpi: bus type
 pci: pci bios revision
 pci: using configuration type
 acpi: ec: look up ec in dsdt
@@ -116,7 +117,6 @@ acpi: pci interrupt link
 ] bus 
 linux plug and play support
 pnp: pnp acpi
-acpi: bus type pnp
 : io resource 
 acpi: acpi bus type
 pnpbios: disabled
@@ -503,3 +503,5 @@ comm: swapper not tainted
 calibrating delay using timer
 it is
 ]  ps3da5 >
+(acpi nvs)
+(acpi data)

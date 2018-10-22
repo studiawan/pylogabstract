@@ -9,7 +9,7 @@ lp0: using
 ppdev: user-space
 bluetooth: core
 bluetooth: hci device
-bluetooth: hci socket
+socket layer initialized
 bluetooth: l2cap
 bluetooth: sco
 bluetooth: rfcomm
@@ -23,7 +23,8 @@ apm: disabled
 initializing cgroup subsys
 linux version
 bios-provided physical ram map
-bios-e820:
+(reserved)
+(usable)
 last_pfn =
 kernel direct mapping tables up to
 ramdisk:
@@ -31,13 +32,9 @@ allocated new ramdisk:
 move ramdisk from
 dmi 2.3 present.
 acpi: rsdp
-acpi: rsdt
-acpi: facp
-acpi: dsdt
 acpi: facs
-acpi: ssdt
-acpi: apic
-acpi: boot
+(r1 dell
+(r1   dell
 highmem available
 lowmem available
 mapped low ram:
@@ -60,21 +57,22 @@ movable zone start pfn for each node
 active pfn ranges
 on node 0 totalpages:
 free_area_init_node: node
-dma zone:
-normal zone:
-highmem zone:
-acpi: pm-timer io port:
+zone:
+acpi: pm-timer
+io port: [0
+io port:
 acpi: local apic address
-acpi: lapic (acpi_id
+] disabled)
+] enabled)
 acpi: ioapic
 apic_id 1, version 32, address
 acpi: int_src_ovr
 used by override
 enabling apic mode:
 using acpi (madt) for smp configuration information
+irq routing
 smp: allowing 4 cpus
-mapped apic to
-mapped ioapic to
+] mapped
 pm: registered nosave memory:
 allocating pci resources starting at
 percpu: allocating
@@ -84,14 +82,12 @@ kernel command line:
 enabling fast fpu save and restore
 enabling unmasked simd fpu exception support
 initializing cpu
-pid hash table entries:
+hash table entries:
 tsc: pit calibration confirmed by pmtimer
-tsc: using pmtimer calibration value
+calibration value
 mhz processor
 console: colour vga
 console [
-dentry cache hash table entries:
-inode-cache hash table entries:
 ] memory: 
 virtual kernel memory layout:
 fixmap  : 
@@ -108,7 +104,6 @@ calibrating delay loop
 security framework initialized
 selinux:  disabled at boot.
 apparmor: apparmor initialized
-mount-cache hash table entries:
 cpu: trace cache: 
 cpu: hyper-threading
 checking 'hlt' instruction
@@ -128,17 +123,17 @@ booting paravirtualized kernel on bare hardware
 ] time: 
 net: registered protocol family
 eisa bus registered 
-acpi: bus type pci registered
+acpi: bus type
 pci: pci bios revision
 pci: using configuration type
 acpi: ec: look up ec in dsdt
 acpi: interpreter enabled
 acpi: (supports
 acpi: using ioapic for
-acpi: pci root bridge 
-] pci: 
-] cpu: 
-] pci 
+acpi: pci root bridge
+32bit mmio pref:
+32bit mmio: [
+] cpu:
 * the chipset may have pm-timer bug
 * this clock source is slow
 * this bug, please use
@@ -148,7 +143,6 @@ acpi: pci interrupt link
 ] bus 
 linux plug and play support
 pnp: pnp acpi
-acpi: bus type pnp
 : io resource 
 acpi: acpi bus type
 pnpbios: disabled
@@ -160,11 +154,7 @@ pages allocated for
 actual entries
 apparmor: apparmor 
 acpi: rtc can wake
-: iomem range
-: ioport range
-ip route cache hash table entries
-tcp established hash table entries:
-tcp bind hash table entries:
+has been reserved
 tcp: hash tables configured
 tcp reno registered
 checking if image is initramfs
@@ -177,18 +167,17 @@ audit: initializing netlink
 highmem bounce pool size:
 hugetlb registered
 vfs: disk quotas
-dquot-cache hash table entries:
 msgmni has been set
 io scheduler
 isapnp: scanning 
 isapnp: no plug
 irq sharing enabled
 ttys0 at i/o
-brd: module loaded
+module loaded
 input: macintosh mouse button emulation
 pnp: ps/2 controller
 pnp: ps/2 appears to have aux port disabled
-kbd port at
+port at
 mouse device common for all mice
 rtc core: registered
 alarms up to one day
@@ -256,14 +245,15 @@ mode sense:
 write cache:
 ]  sda1
 b44.c:
-attached scsi
+attached scsi cd-rom
+attached scsi disk
+attached scsi removable disk
 mmc drive:
 uniform cd-rom driver
 device scan complete
 assuming drive cache:
 ]  sdb:
 ] aufs
-loop: module loaded
 squashfs: version
 kjournald starting.
 internal journal
@@ -292,11 +282,8 @@ pc speaker as
 dell systems management base driver
 netfilter core team
 ]     0: 0x
-using pit calibration value
 controller found. probing
-aux port at
 nothing has been logged yet
-
 dma_sb_region_create
 : mac addr
 internal vlan enabled
@@ -394,9 +381,7 @@ link is not ready
 sda: sda1
 allocate port service
 assign_interrupt_mode found msi
-]   io window:
-]   mem window:
-]   prefetch window:
+window:
 registered nosave memory region:
 nf_conntrack version 
 using parport0
@@ -432,7 +417,7 @@ unable to open rtc device
 hash matches device
 ramdisk driver initialized:
 real time clock driver
-boot video device is
+boot video device
 limiting direct pci
 ): initialized
 works better, please notify
@@ -530,3 +515,13 @@ comm: swapper not tainted
 ------------[ cut
 calibrating delay using timer
 it is
+claimed by
+pci hot plug pci
+pci bridge, secondary bus
+: supports
+pme# disabled
+transparent bridge
+(acpi nvs)
+(acpi data)
+pme# supported from
+could not be reserved

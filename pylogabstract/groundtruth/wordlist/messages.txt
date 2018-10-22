@@ -24,7 +24,8 @@ apm: disabled
 initializing cgroup subsys
 linux version
 bios-provided physical ram map
-bios-e820:
+(usable)
+(reserved)
 last_pfn =
 kernel direct mapping tables up to
 ramdisk:
@@ -32,13 +33,9 @@ allocated new ramdisk:
 move ramdisk from
 dmi 2.3 present.
 acpi: rsdp
-acpi: rsdt
-acpi: facp
-acpi: dsdt
 acpi: facs
-acpi: ssdt
-acpi: apic
-acpi: boot
+(r1 dell
+(r1   dell
 highmem available
 lowmem available
 mapped low ram:
@@ -66,7 +63,8 @@ normal zone:
 highmem zone:
 acpi: pm-timer io port:
 acpi: local apic address
-acpi: lapic (acpi_id
+] disabled)
+] enabled)
 acpi: ioapic
 apic_id 1, version 32, address
 acpi: int_src_ovr
@@ -85,14 +83,12 @@ kernel command line:
 enabling fast fpu save and restore
 enabling unmasked simd fpu exception support
 initializing cpu
-pid hash table entries:
+hash table entries:
 tsc: pit calibration confirmed by pmtimer
-tsc: using pmtimer calibration value
+calibration value
 mhz processor
 console: colour vga
 console [
-dentry cache hash table entries:
-inode-cache hash table entries:
 ] memory: 
 virtual kernel memory layout:
 fixmap  : 
@@ -109,7 +105,6 @@ calibrating delay loop
 security framework initialized
 selinux:  disabled at boot.
 apparmor: apparmor initialized
-mount-cache hash table entries:
 cpu: trace cache: 
 cpu: hyper-threading
 checking 'hlt' instruction
@@ -129,7 +124,7 @@ booting paravirtualized kernel on bare hardware
 ] time: 
 net: registered protocol family
 eisa bus registered 
-acpi: bus type pci registered
+acpi: bus type
 pci: pci bios revision
 pci: using configuration type
 acpi: ec: look up ec in dsdt
@@ -138,8 +133,7 @@ acpi: (supports
 acpi: using ioapic for
 acpi: pci root bridge 
 ] pci: 
-] cpu: 
-] pci 
+] cpu:
 * the chipset may have pm-timer bug
 * this clock source is slow
 * this bug, please use
@@ -149,7 +143,6 @@ acpi: pci interrupt link
 ] bus 
 linux plug and play support
 pnp: pnp acpi
-acpi: bus type pnp
 : io resource 
 acpi: acpi bus type
 pnpbios: disabled
@@ -161,11 +154,7 @@ pages allocated for
 actual entries
 apparmor: apparmor 
 acpi: rtc can wake
-: iomem range
-: ioport range
-ip route cache hash table entries
-tcp established hash table entries:
-tcp bind hash table entries:
+has been reserved
 tcp: hash tables configured
 tcp reno registered
 checking if image is initramfs
@@ -178,14 +167,12 @@ audit: initializing netlink
 highmem bounce pool size:
 hugetlb registered
 vfs: disk quotas
-dquot-cache hash table entries:
 msgmni has been set
 io scheduler
 isapnp: scanning 
 isapnp: no plug
 irq sharing enabled
 ttys0 at i/o
-brd: module loaded
 input: macintosh mouse button emulation
 pnp: ps/2 controller
 pnp: ps/2 appears to have aux port disabled
@@ -264,7 +251,7 @@ device scan complete
 assuming drive cache:
 ]  sdb:
 ] aufs
-loop: module loaded
+module loaded
 squashfs: version
 kjournald starting.
 internal journal
@@ -293,7 +280,6 @@ pc speaker as
 dell systems management base driver
 netfilter core team
 ]     0: 0x
-using pit calibration value
 controller found. probing
 aux port at
 nothing has been logged yet
@@ -410,9 +396,7 @@ link is not ready
 sda: sda1
 allocate port service
 assign_interrupt_mode found msi
-]   io window:
-]   mem window:
-]   prefetch window:
+window:
 registered nosave memory region:
 nf_conntrack version 
 using parport0
@@ -578,4 +562,12 @@ hdc: vbox cd-rom
 hdc: udma
 hdc: atapi
 shutting down for
-
+claimed by
+pci hot plug
+pme# disabled
+transparent bridge
+could not be reserved
+(acpi nvs)
+(acpi data)
+pci bridge, secondary bus
+pme# supported from

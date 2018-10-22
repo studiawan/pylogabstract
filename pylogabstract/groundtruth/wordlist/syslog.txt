@@ -10,10 +10,6 @@ lp0: using
 ppdev: user-space
 bluetooth: core
 bluetooth: hci device
-bluetooth: hci socket
-bluetooth: l2cap
-bluetooth: sco
-bluetooth: rfcomm
 bluetooth: bnep
 bridge firewalling
 dropping netif_f_ufo
@@ -24,7 +20,8 @@ apm: disabled
 initializing cgroup subsys
 linux version
 bios-provided physical ram map
-bios-e820:
+(usable)
+(reserved)
 last_pfn =
 kernel direct mapping tables up to
 ramdisk:
@@ -33,12 +30,9 @@ move ramdisk from
 dmi 2.3 present.
 acpi: rsdp
 acpi: rsdt
-acpi: facp
-acpi: dsdt
 acpi: facs
-acpi: ssdt
-acpi: apic
-acpi: boot
+(r1 dell
+(r1   dell
 highmem available
 lowmem available
 mapped low ram:
@@ -61,12 +55,9 @@ movable zone start pfn for each node
 active pfn ranges
 on node 0 totalpages:
 free_area_init_node: node
-dma zone:
-normal zone:
-highmem zone:
+zone:
 acpi: pm-timer io port:
 acpi: local apic address
-acpi: lapic (acpi_id
 acpi: ioapic
 apic_id 1, version 32, address
 acpi: int_src_ovr
@@ -74,8 +65,7 @@ used by override
 enabling apic mode:
 using acpi (madt) for smp configuration information
 smp: allowing 4 cpus
-mapped apic to
-mapped ioapic to
+mapped
 pm: registered nosave memory:
 allocating pci resources starting at
 percpu: allocating
@@ -85,14 +75,11 @@ kernel command line:
 enabling fast fpu save and restore
 enabling unmasked simd fpu exception support
 initializing cpu
-pid hash table entries:
 tsc: pit calibration confirmed by pmtimer
-tsc: using pmtimer calibration value
+calibration value
 mhz processor
 console: colour vga
 console [
-dentry cache hash table entries:
-inode-cache hash table entries:
 ] memory: 
 virtual kernel memory layout:
 fixmap  : 
@@ -109,7 +96,6 @@ calibrating delay loop
 security framework initialized
 selinux:  disabled at boot.
 apparmor: apparmor initialized
-mount-cache hash table entries:
 cpu: trace cache: 
 cpu: hyper-threading
 checking 'hlt' instruction
@@ -129,17 +115,16 @@ booting paravirtualized kernel on bare hardware
 ] time: 
 net: registered protocol family
 eisa bus registered 
-acpi: bus type pci registered
+acpi: bus type
+acpi: acpi bus type
 pci: pci bios revision
 pci: using configuration type
 acpi: ec: look up ec in dsdt
 acpi: interpreter enabled
 acpi: (supports
 acpi: using ioapic for
-acpi: pci root bridge 
-] pci: 
-] cpu: 
-] pci 
+acpi: pci root bridge
+] cpu:
 * the chipset may have pm-timer bug
 * this clock source is slow
 * this bug, please use
@@ -149,9 +134,7 @@ acpi: pci interrupt link
 ] bus 
 linux plug and play support
 pnp: pnp acpi
-acpi: bus type pnp
-: io resource 
-acpi: acpi bus type
+: io resource
 pnpbios: disabled
 netlabel: initializing
 netlabel:  domain hash
@@ -161,11 +144,8 @@ pages allocated for
 actual entries
 apparmor: apparmor 
 acpi: rtc can wake
-: iomem range
-: ioport range
-ip route cache hash table entries
-tcp established hash table entries:
-tcp bind hash table entries:
+has been reserved
+hash table entries
 tcp: hash tables configured
 tcp reno registered
 checking if image is initramfs
@@ -178,14 +158,13 @@ audit: initializing netlink
 highmem bounce pool size:
 hugetlb registered
 vfs: disk quotas
-dquot-cache hash table entries:
 msgmni has been set
 io scheduler
 isapnp: scanning 
 isapnp: no plug
 irq sharing enabled
 ttys0 at i/o
-brd: module loaded
+module loaded
 input: macintosh mouse button emulation
 pnp: ps/2 controller
 pnp: ps/2 appears to have aux port disabled
@@ -212,7 +191,7 @@ processor acpi
 usbcore: registered new
 pci int d
 setting latency timer
-ehci host controller
+host controller
 new usb bus registered
 debug port
 cache line size of
@@ -226,7 +205,6 @@ no dock devices found
 scsi subsystem initialized
 libata version
 : pci int
-uhci host controller
 , io base
 chosen from
 speed usb device using
@@ -257,14 +235,14 @@ mode sense:
 write cache:
 ]  sda1
 b44.c:
-attached scsi
+attached scsi disk
+attached scsi cd-rom
 mmc drive:
 uniform cd-rom driver
 device scan complete
 assuming drive cache:
 ]  sdb:
 ] aufs
-loop: module loaded
 squashfs: version
 kjournald starting.
 internal journal
@@ -293,7 +271,6 @@ pc speaker as
 dell systems management base driver
 netfilter core team
 ]     0: 0x
-using pit calibration value
 controller found. probing
 aux port at
 nothing has been logged yet
@@ -314,11 +291,11 @@ registering hinfo record with values
 server startup complete
 client connected from
 bluetooth daemon
-starting sdp server
+sdp server
 starting experimental netlink support
 failed to find bluetooth netlink family
 can't init plugin
-bridge pan0 created
+bridge pan0
 <info>  starting... 
 eth0: driver is
 found new ethernet device
@@ -365,7 +342,7 @@ dhcpack
 <info>    gateway
 <info>    nameserver
 (ip configure commit)
-joining mdns multicast group on interface
+mdns multicast group on interface
 new relevant interface
 registering new address record
 dhclient: bound to
@@ -374,10 +351,7 @@ dhclient: bound to
 step time server
 failed to register before timeout
 killed by term signal
-bridge pan0 removed
-stopping sdp server
 got sigterm, quitting
-leaving mdns multicast group on interface
 mounted /dev/sda1
 warning: unable to activate console:
 cmdline options:
@@ -390,20 +364,16 @@ received response with invalid source port
 external fuse
 value location for
 instance of invalid non-instantiatable type
-g_signal_emit_valist: assertion
-g_object_unref: assertion
-/etc/cron.hourly
+: assertion
 (cron) info
 (cron) startup
-/etc/cron.monthly
 session manager not running
-module.c: failed to load  module
-/etc/cron.daily
+module.c: failed to load module
+run-parts --report
 invoke-rc.d anacron start
-
 logitech optical usb
 hci usb driver
-hci socket layer initialized
+socket layer initialized
 hci device and connection
 core ver
 registered misc device
@@ -543,7 +513,7 @@ unable to open rtc device
 hash matches device
 ramdisk driver initialized:
 real time clock driver
-boot video device is
+boot video device
 limiting direct pci
 ): initialized
 works better, please notify
@@ -673,3 +643,26 @@ hdc: vbox cd-rom
 hdc: udma
 hdc: atapi
 shutting down for
+transparent bridge
+pme# disabled
+: supports
+claimed by
+pci hot plug
+window:
+32bit mmio:
+pme# supported
+io port:
+could not be reserved
+initialization failed
+secondary bus
+attached scsi removable disk
+32bit mmio pref:
+irq routing
+l2cap ver
+rfcomm ver
+rfcomm tty layer
+sco (voice link)
+bluetooth: rfcomm
+(acpi
+] enabled)
+] disabled)
