@@ -41,7 +41,7 @@ class Output(object):
         for abstraction_id, abstraction in abstractions_prediction.items():
             new_id = -1
             for groundtruth_id, groundtruth_abstraction in abstraction_withid.items():
-                if abstraction['abstraction'] == groundtruth_abstraction:
+                if abstraction['abstraction'].rstrip() == groundtruth_abstraction:
                     new_id = groundtruth_id
 
             # if id exist, write abstractions side by side
