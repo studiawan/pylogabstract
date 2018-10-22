@@ -1,3 +1,4 @@
+import sys
 from itertools import combinations
 from collections import defaultdict, OrderedDict
 # from pylogabstract.clustering.clustering import LogClustering
@@ -335,7 +336,8 @@ class LogAbstraction(object):
         return final_abstractions, raw_logs
 
 if __name__ == '__main__':
-    filename = 'syslog.3'
+    filename = sys.argv[1]
+    print('Processing', filename, '...')
     logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/' + filename
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
