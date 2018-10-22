@@ -67,7 +67,8 @@ class LogAbstraction(object):
             parent_abstraction = abstraction2
             child_abstraction = abstraction1
         elif (total1 == total2) and (total1 > 0) and (total2 > 0):
-            parent_id, child_id = -1, -1
+            parent_id = cluster_id1
+            child_id = cluster_id2
             parent_abstraction = abstraction1
             child_abstraction = abstraction2
 
@@ -98,7 +99,7 @@ class LogAbstraction(object):
                 if character.isdigit():
                     digit_count += 1
 
-            if alphabet_count <= 1 or digit_count == 1:
+            if alphabet_count == 1 or digit_count == 1:
                 self.word_check.append(word)
                 word = '*'
 
@@ -334,15 +335,16 @@ class LogAbstraction(object):
         return final_abstractions, raw_logs
 
 if __name__ == '__main__':
-    logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/daemon.log'
+    filename = 'syslog.3'
+    logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/' + filename
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
     Output.write_perabstraction(abstraction_results, rawlogs, 'results-perabstraction.txt')
     Output.write_perline(abstraction_results, rawlogs, 'results-perline.txt')
 
-    abstraction_withid_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-abstraction_withid/daemon.log'
+    abstraction_withid_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-abstraction_withid/' + filename
     abstractions_groundtruth_file = \
-        '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-lineid_abstractionid/daemon.log'
+        '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-lineid_abstractionid/' + filename
     comparison_file = 'compare.txt'
     Output.write_comparison(abstraction_withid_file, abstractions_groundtruth_file, abstraction_results,
                             rawlogs, comparison_file)
