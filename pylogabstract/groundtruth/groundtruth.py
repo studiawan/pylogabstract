@@ -84,11 +84,55 @@ class GroundTruth(object):
         message_length_group = preprocess.message_length_group
         event_attributes = preprocess.event_attributes
 
-        return raw_logs, message_length_group, event_attributes
+        return raw_logs, parsed_logs, message_length_group, event_attributes
+
+    def __set_abstraction_label2(self, log_file, wordlist):
+        # preprocessing
+        raw_logs, parsed_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
+        final_groups = {}
+        final_groups_id = 0
+
+        for message_length, unique_event_id in message_length_group.items():
+            # check based on word list
+            wordlist_group = defaultdict(list)
+            for event_id in unique_event_id:
+                for line_id in event_attributes[event_id]['member']:
+                    log_lower = raw_logs[line_id].lower().strip()
+                    flag = True
+                    for index, label in enumerate(wordlist):
+                        if label in log_lower:
+                            wordlist_group[index].append(line_id)
+                            flag = False
+                            break
+
+                    if flag:
+                        print(log_lower)
+                        wordlist_group[-1].append(line_id)
+
+            # check based on length of other fields excluding message
+            field_length_group = defaultdict(list)
+            for index, line_ids in wordlist_group.items():
+                for line_id in line_ids:
+                    parsed = parsed_logs[line_id]
+                    field_length = 0
+                    for label, value in parsed.items():
+                        if label != 'message':
+                            value_split = value.split()
+                            field_length += len(value_split)
+
+                    total_length = field_length + message_length
+                    field_length_group[(index, total_length)].append(line_id)
+
+            # convert to abstraction_id: line_id
+            for index, group in field_length_group.items():
+                final_groups[final_groups_id] = group
+                final_groups_id += 1
+
+        return final_groups, raw_logs
 
     def __set_abstraction_label(self, log_file, wordlist):
         # preprocessing
-        raw_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
+        raw_logs, parsed_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
 
         # label each log line based on pre-defined wordlist
         groups = {}
@@ -209,7 +253,7 @@ class GroundTruth(object):
                 
                 # set abstraction label per group of message length
                 log_file = os.path.join(self.configurations[self.dataset]['base_dir'], filename)
-                groups, raw_logs = self.__set_abstraction_label(log_file, wordlist)
+                groups, raw_logs = self.__set_abstraction_label2(log_file, wordlist)
 
                 # get abstraction for each group/cluster
                 abstractions = self.__get_perabstraction(groups, raw_logs)
