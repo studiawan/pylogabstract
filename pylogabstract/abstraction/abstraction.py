@@ -100,7 +100,7 @@ class LogAbstraction(object):
                 if character.isdigit():
                     digit_count += 1
 
-            if alphabet_count == 1 or digit_count == 1:
+            if alphabet_count == 1 or digit_count == 1 or digit_count == len(word):
                 self.word_check.append(word)
                 word = '*'
 
