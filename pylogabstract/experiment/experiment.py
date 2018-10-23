@@ -121,6 +121,8 @@ class Experiment(object):
         # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
         Output.write_perabstraction(abstractions, raw_logs, properties['perabstraction_path'])
+        Output.write_comparison(properties['abstraction_withid_path'], properties['lineid_abstractionid_path'],
+                                abstractions, raw_logs, properties['comparison_path'])
 
         # update abstraction id based on ground truth and convert the format to line_id: abstraction_id
         lineid_abstractionid_prediction = \
@@ -130,7 +132,7 @@ class Experiment(object):
         metrics = self.__get_evaluation_metrics(properties['lineid_abstractionid_path'],
                                                 lineid_abstractionid_prediction)
         evaluation_metrics = (filename, metrics['precision'], metrics['recall'], metrics['f1'], metrics['accuracy'])
-        print('p:', metrics['precision'], 'r:', metrics['recall'], 'f1:', metrics['f1'], 'acc:', metrics['accuracy'])
+        print('accuracy:', metrics['accuracy'])
 
         return evaluation_metrics
 
