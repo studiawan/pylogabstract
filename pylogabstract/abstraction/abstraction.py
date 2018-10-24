@@ -143,7 +143,6 @@ class LogAbstraction(object):
 
                 # run clustering again if abstraction is all asterisk, such as * * * * *
                 if check_asterisk == {'*'} or over_abstraction:
-                    print('over abstraction:', over_abstraction, asterisk)
                     # get partial data only for the cluster that has all asterisk
                     partial_parsed_logs, partial_raw_logs, partial_event_attributes = \
                         self.__get_partial_logs(cluster['nodes'], event_attributes, parsed_logs, raw_logs)
@@ -192,67 +191,72 @@ class LogAbstraction(object):
             if abstractions[cluster_id1]['check'] and abstractions[cluster_id2]['check']:
                 valid_combinations.append((cluster_id1, cluster_id2))
 
-        for cluster_id1, cluster_id2 in valid_combinations:
-            if (cluster_id1 not in checked_cluster_id) and (cluster_id2 not in checked_cluster_id):
-                hs = HammingSimilarity()
-                hamming_similarity = hs.get_weighted_hamming(abstractions[cluster_id1]['abstraction'],
-                                                             abstractions[cluster_id2]['abstraction'])
-                if hamming_similarity > 0.:
-                    abstraction1 = abstractions[cluster_id1]['abstraction'].split()
-                    abstraction2 = abstractions[cluster_id2]['abstraction'].split()
+        # if there is valid combinations
+        if valid_combinations:
+            for cluster_id1, cluster_id2 in valid_combinations:
+                if (cluster_id1 not in checked_cluster_id) and (cluster_id2 not in checked_cluster_id):
+                    hs = HammingSimilarity()
+                    hamming_similarity = hs.get_weighted_hamming(abstractions[cluster_id1]['abstraction'],
+                                                                 abstractions[cluster_id2]['abstraction'])
+                    if hamming_similarity > 0.:
+                        abstraction1 = abstractions[cluster_id1]['abstraction'].split()
+                        abstraction2 = abstractions[cluster_id2]['abstraction'].split()
 
-                    # check parent and child abstraction
-                    parent_abstraction, child_abstraction, parent_id, child_id = \
-                        self.__check_total_asterisk(abstraction1, abstraction2, cluster_id1, cluster_id2)
+                        # check parent and child abstraction
+                        parent_abstraction, child_abstraction, parent_id, child_id = \
+                            self.__check_total_asterisk(abstraction1, abstraction2, cluster_id1, cluster_id2)
 
-                    # check for merge
-                    # once merge = False, it will not continue checking
-                    merge = False
-                    parent_abstraction_check = []
-                    for word1, word2 in zip(parent_abstraction, child_abstraction):
-                        word1_check = self.__check_word(word1)
-                        word2_check = self.__check_word(word2)
-                        parent_abstraction_check.append(word1_check)
+                        # check for merge
+                        # once merge = False, it will not continue checking
+                        merge = False
+                        parent_abstraction_check = []
+                        for word1, word2 in zip(parent_abstraction, child_abstraction):
+                            word1_check = self.__check_word(word1)
+                            word2_check = self.__check_word(word2)
+                            parent_abstraction_check.append(word1_check)
 
-                        if word1 == word2:
-                            merge = True
-
-                        elif (word1 != word2) and (word1 == '*'):
-                            merge = True
-
-                        elif (word1 != word2) and (word1 != '*') and (word2 != '*'):
-                            if word1_check == word2_check:
+                            if word1 == word2:
                                 merge = True
-                            else:
-                                merge = False
-                                break
 
-                        elif (word1 != word2) and (word1 != '*') and (word2 == '*'):
-                            if word1_check == word2:
+                            elif (word1 != word2) and (word1 == '*'):
                                 merge = True
+
+                            elif (word1 != word2) and (word1 != '*') and (word2 != '*'):
+                                if word1_check == word2_check:
+                                    merge = True
+                                else:
+                                    merge = False
+                                    break
+
+                            elif (word1 != word2) and (word1 != '*') and (word2 == '*'):
+                                if word1_check == word2:
+                                    merge = True
+                                else:
+                                    merge = False
+                                    break
+
+                        # merge abstractions
+                        if merge:
+                            # change asterisk here
+                            if (parent_id != -1) and (child_id != -1):
+                                abstractions[parent_id]['abstraction'] = ' '.join(parent_abstraction_check)
+                                if abstractions[parent_id]['abstraction'] in abstractionstr_abstractionid.keys():
+                                    existing_id = abstractionstr_abstractionid[abstractions[parent_id]['abstraction']]
+                                    checked_abstractions[existing_id]['nodes'].extend(abstractions[child_id]['nodes'])
+
+                                else:
+                                    checked_abstractions[cluster_id] = {
+                                        'abstraction': abstractions[parent_id]['abstraction'],
+                                        'nodes': abstractions[cluster_id1]['nodes'] + abstractions[cluster_id2]['nodes']
+                                    }
+                                    abstractionstr_abstractionid[abstractions[parent_id]['abstraction']] = cluster_id
+                                    cluster_id += 1
+
+                                checked_cluster_id.append(child_id)
+                                checked_parent_id.append(parent_id)
+
                             else:
-                                merge = False
-                                break
-
-                    # merge abstractions
-                    if merge:
-                        # change asterisk here
-                        if (parent_id != -1) and (child_id != -1):
-                            abstractions[parent_id]['abstraction'] = ' '.join(parent_abstraction_check)
-                            if abstractions[parent_id]['abstraction'] in abstractionstr_abstractionid.keys():
-                                existing_id = abstractionstr_abstractionid[abstractions[parent_id]['abstraction']]
-                                checked_abstractions[existing_id]['nodes'].extend(abstractions[child_id]['nodes'])
-
-                            else:
-                                checked_abstractions[cluster_id] = {
-                                    'abstraction': abstractions[parent_id]['abstraction'],
-                                    'nodes': abstractions[cluster_id1]['nodes'] + abstractions[cluster_id2]['nodes']
-                                }
-                                abstractionstr_abstractionid[abstractions[parent_id]['abstraction']] = cluster_id
-                                cluster_id += 1
-
-                            checked_cluster_id.append(child_id)
-                            checked_parent_id.append(parent_id)
+                                not_merge_id.extend([cluster_id1, cluster_id2])
 
                         else:
                             not_merge_id.extend([cluster_id1, cluster_id2])
@@ -260,20 +264,21 @@ class LogAbstraction(object):
                     else:
                         not_merge_id.extend([cluster_id1, cluster_id2])
 
-                else:
-                    not_merge_id.extend([cluster_id1, cluster_id2])
+            # for cluster id that not in checked_cluster_id and checked_parent_id
+            not_merge_id = set(not_merge_id)
+            for index in not_merge_id:
+                if (index not in checked_cluster_id) and (index not in checked_parent_id):
+                    checked_abstractions[cluster_id] = {
+                        'abstraction': abstractions[index]['abstraction'],
+                        'nodes': abstractions[index]['nodes']
+                    }
+                    cluster_id += 1
 
-        # for cluster id that not in checked_cluster_id and checked_parent_id
-        not_merge_id = set(not_merge_id)
-        for index in not_merge_id:
-            if (index not in checked_cluster_id) and (index not in checked_parent_id):
-                checked_abstractions[cluster_id] = {
-                    'abstraction': abstractions[index]['abstraction'],
-                    'nodes': abstractions[index]['nodes']
-                }
-                cluster_id += 1
+            return checked_abstractions
 
-        return checked_abstractions
+        # if there are no valid combinations, just return the input abstractions
+        else:
+            return abstractions
 
     def __run_merge_abstraction(self):
         merged_abstractions = {}
@@ -356,21 +361,23 @@ class LogAbstraction(object):
 if __name__ == '__main__':
     # get log file name
     if len(sys.argv) == 1:
-        print('Please input file name after the command.')
+        print('Please input dataset and file name after the command.')
         sys.exit(1)
     else:
-        filename = sys.argv[1]
-        print('Processing', filename, '...')
+        dataset = sys.argv[1]
+        filename = sys.argv[2]
+        print('Processing dataset:', dataset, 'filename:', filename, '...')
 
     # get log abstraction
-    logfile = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/' + filename
+    logfile = '/home/hudan/Git/pylogabstract/datasets/' + dataset + '/logs/' + filename
     log_abstraction = LogAbstraction()
     abstraction_results, rawlogs = log_abstraction.get_abstraction(logfile)
 
     # prepare ground truth for comparison
-    abstraction_withid_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-abstraction_withid/' + filename
+    abstraction_withid_file = \
+        '/home/hudan/Git/pylogabstract/datasets/' + dataset + '/logs-abstraction_withid/' + filename
     abstractions_groundtruth_file = \
-        '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-lineid_abstractionid/' + filename
+        '/home/hudan/Git/pylogabstract/datasets/' + dataset + '/logs-lineid_abstractionid/' + filename
 
     # write output to file
     Output.write_perabstraction(abstraction_results, rawlogs, 'results-perabstraction.txt')
