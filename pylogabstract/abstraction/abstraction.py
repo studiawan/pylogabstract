@@ -72,6 +72,11 @@ class LogAbstraction(object):
             child_id = cluster_id2
             parent_abstraction = abstraction1
             child_abstraction = abstraction2
+        elif (total1 == total2) and (total1 == 0) and (total2 == 0):
+            parent_id = cluster_id1
+            child_id = cluster_id2
+            parent_abstraction = abstraction1
+            child_abstraction = abstraction2
 
         return parent_abstraction, child_abstraction, parent_id, child_id
 
@@ -237,12 +242,21 @@ class LogAbstraction(object):
 
                         # merge abstractions
                         if merge:
-                            # change asterisk here
+                            # add to checked abstractions
                             if (parent_id != -1) and (child_id != -1):
                                 abstractions[parent_id]['abstraction'] = ' '.join(parent_abstraction_check)
                                 if abstractions[parent_id]['abstraction'] in abstractionstr_abstractionid.keys():
                                     existing_id = abstractionstr_abstractionid[abstractions[parent_id]['abstraction']]
+
+                                    # check parent_id nodes because of __check_word convert word to asterisk
+                                    extended_nodes = []
+                                    for node in abstractions[parent_id]['nodes']:
+                                        if node not in checked_abstractions[existing_id]['nodes']:
+                                            extended_nodes.append(node)
+
+                                    # extend existing nodes with additional nodes
                                     checked_abstractions[existing_id]['nodes'].extend(abstractions[child_id]['nodes'])
+                                    checked_abstractions[existing_id]['nodes'].extend(extended_nodes)
 
                                 else:
                                     checked_abstractions[cluster_id] = {
