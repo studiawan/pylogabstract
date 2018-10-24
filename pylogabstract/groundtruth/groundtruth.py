@@ -86,7 +86,7 @@ class GroundTruth(object):
 
         return raw_logs, parsed_logs, message_length_group, event_attributes
 
-    def __set_abstraction_label2(self, log_file, wordlist):
+    def __set_abstraction_label(self, log_file, wordlist):
         # preprocessing
         raw_logs, parsed_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
         final_groups = {}
@@ -100,10 +100,20 @@ class GroundTruth(object):
                     log_lower = raw_logs[line_id].lower().strip()
                     flag = True
                     for index, label in enumerate(wordlist):
-                        if label in log_lower:
-                            wordlist_group[index].append(line_id)
-                            flag = False
-                            break
+                        if '&AND&' in label:
+                            label_split = label.split(' &AND& ')
+                            label1, label2 = label_split[0], label_split[1]
+
+                            if label1 in log_lower and label2 in log_lower:
+                                wordlist_group[index].append(line_id)
+                                flag = False
+                                break
+
+                        else:
+                            if label in log_lower:
+                                wordlist_group[index].append(line_id)
+                                flag = False
+                                break
 
                     if flag:
                         print(log_lower)
@@ -125,40 +135,6 @@ class GroundTruth(object):
 
             # convert to abstraction_id: line_id
             for index, group in field_length_group.items():
-                final_groups[final_groups_id] = group
-                final_groups_id += 1
-
-        return final_groups, raw_logs
-
-    def __set_abstraction_label(self, log_file, wordlist):
-        # preprocessing
-        raw_logs, parsed_logs, message_length_group, event_attributes = self.__get_preprocessed_logs(log_file)
-
-        # label each log line based on pre-defined wordlist
-        groups = {}
-        for message_length, unique_event_id in message_length_group.items():
-            temp_group = defaultdict(list)
-            for event_id in unique_event_id:
-                for line_id in event_attributes[event_id]['member']:
-                    log_lower = raw_logs[line_id].lower().strip()
-                    flag = True
-                    for index, label in enumerate(wordlist):
-                        if label in log_lower:
-                            temp_group[index].append(line_id)
-                            flag = False
-                            break
-
-                    if flag:
-                        print(log_lower)
-                        temp_group[-1].append(line_id)
-
-            groups[message_length] = temp_group
-
-        # convert to abstraction_id: line_id
-        final_groups = {}
-        final_groups_id = 0
-        for message_length, all_group in groups.items():
-            for index, group in all_group.items():
                 final_groups[final_groups_id] = group
                 final_groups_id += 1
 
@@ -253,7 +229,7 @@ class GroundTruth(object):
                 
                 # set abstraction label per group of message length
                 log_file = os.path.join(self.configurations[self.dataset]['base_dir'], filename)
-                groups, raw_logs = self.__set_abstraction_label2(log_file, wordlist)
+                groups, raw_logs = self.__set_abstraction_label(log_file, wordlist)
 
                 # get abstraction for each group/cluster
                 abstractions = self.__get_perabstraction(groups, raw_logs)
@@ -272,7 +248,7 @@ if __name__ == '__main__':
     wordlist_directory = ''
     dataset_list = ['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal',
                     'dfrws-2016', 'honeynet-challenge5', 'honeynet-challenge7']
-    dataset_name = dataset_list[0]
+    dataset_name = dataset_list[1]
 
     gt = GroundTruth(dataset_name, datasets_config, wordlist_directory)
     gt.get_ground_truth()
