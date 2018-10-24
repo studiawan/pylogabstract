@@ -666,3 +666,60 @@ bluetooth: rfcomm
 (acpi
 ] enabled)
 ] disabled)
+terminated
+unknown partition table
+normal exit
+unrecovered read error
+i/o error, dev
+buffer i/o error on device
+autoconnect
+ps3_system_bus_probe
+now unmanaged
+terminated
+started
+hal disappeared
+driver is
+exported as
+addresses count:
+probing pci hardware
+ps3_system_bus_match:
+read() failed:
+daemon startup
+started
+read capacity failed
+sense not available
+devices removed
+kernel logging (proc)
+kernel log daemon
+hci dev
+starting security manager
+no ipv6 routers present
+has been enabled
+anacron 2.3 started
+jobs will be executed
+disconnected by
+disconnected from
+registered interface
+guessed connection type
+dell usb keyboard
+updated timestamp for job
+found new 802.11 wifi device
+supplicant interface state change:
+will run job
+unknown cmd
+driver does not support
+device added
+unable to locate theme engine
+supplicant manager
+unmanaged device found
+files changed
+hal re-appeared
+can't find host
+verify of flash database failed
+no servers can be used
+carrier now off
+instance with invalid
+failed to reply
+no longer relevant for
+withdrawing address record
+unable to find desktop file

@@ -505,3 +505,4 @@ it is
 ]  ps3da5 >
 (acpi nvs)
 (acpi data)
+probing pci hardware
