@@ -1,3 +1,27 @@
+dev=2(sb_06) &AND& miss
+dev=2(sb_08) &AND& miss
+dev=7(sb_01) &AND& miss
+dev=8(sb_03) &AND& miss
+dev=3(sb_04) &AND& miss
+dev=1(sb_05) &AND& miss
+dev=1(sb_07) &AND& miss
+dev=9(ioc0_02) &AND& miss
+dev=6(sb_02) &AND& miss
+dev=5(vuart_02) &AND& miss
+dev=10(ioc0_01) &AND& miss
+dev=9(ioc0_02) &AND& match
+dev=10(ioc0_01) &AND& match
+dev=5(vuart_02) &AND& match
+dev=6(sb_02) &AND& match
+dev=7(sb_01) &AND& match
+dev=2(sb_06) &AND& match
+dev=2(sb_08) &AND& match
+dev=1(sb_05) &AND& match
+dev=1(sb_07) &AND& match
+dev=3(sb_04) &AND& match
+dev=8(sb_03) &AND& match
+dev=11(lpm_01)
+dev=4(vuart_01)
 ubuntu syslogd
 kernel: inspecting
 cannot find map file
@@ -108,7 +132,7 @@ cpu0: intel
 brought up 
 total of 
 attaching sched-domain:
-]  domain
+: span
 ]   groups: 
 net_namespace: 
 booting paravirtualized kernel on bare hardware
@@ -220,7 +244,7 @@ initializing usb mass storage
 scsi emulation for usb mass storage
 device found at
 waiting for device to settle before scanning
-logitech usb trackball as
+as /class/input/input
 usb mass storage support registered
 usb hid core driver
 , max udma/
@@ -296,10 +320,8 @@ starting experimental netlink support
 failed to find bluetooth netlink family
 can't init plugin
 bridge pan0
-<info>  starting... 
-eth0: driver is
+<info>  starting...
 found new ethernet device
-(eth0): exported as
 trying to start
 scplugin-ifupdown: init!
 scplugin-ifupdown: update_system_hostname
@@ -371,7 +393,6 @@ session manager not running
 module.c: failed to load module
 run-parts --report
 invoke-rc.d anacron start
-logitech optical usb
 hci usb driver
 socket layer initialized
 hci device and connection
@@ -402,7 +423,6 @@ of video memory
 switching to colour frame buffer device
 total hugetlb memory
 cpu hotplug not supported
-linux ppc64
 ibm ebus device driver
 ]    groups:
 ]   domain
@@ -439,7 +459,7 @@ for crashkernel (system ram:
 crash kernel location must be
 -----------------------------------------------------
 *** 0000 : cf
-*** 0000 : #1 smp
+#1 smp
 swap on /dev
 generic bluetooth usb driver
 ps3_lpm_probe:
@@ -650,7 +670,7 @@ claimed by
 pci hot plug
 window:
 32bit mmio:
-pme# supported
+pme# supported from
 io port:
 could not be reserved
 initialization failed
@@ -673,19 +693,16 @@ unrecovered read error
 i/o error, dev
 buffer i/o error on device
 autoconnect
-ps3_system_bus_probe
 now unmanaged
 terminated
-started
-hal disappeared
+<info>  hal
 driver is
 exported as
 addresses count:
 probing pci hardware
-ps3_system_bus_match:
+as /class/input/input
 read() failed:
 daemon startup
-started
 read capacity failed
 sense not available
 devices removed
@@ -701,7 +718,6 @@ disconnected by
 disconnected from
 registered interface
 guessed connection type
-dell usb keyboard
 updated timestamp for job
 found new 802.11 wifi device
 supplicant interface state change:
@@ -713,7 +729,6 @@ unable to locate theme engine
 supplicant manager
 unmanaged device found
 files changed
-hal re-appeared
 can't find host
 verify of flash database failed
 no servers can be used
@@ -723,3 +738,24 @@ failed to reply
 no longer relevant for
 withdrawing address record
 unable to find desktop file
+unknown partition table
+read capacity failed
+sense not available
+kernel logging (proc)
+kernel log daemon
+unrecovered read error
+verify of flash database failed
+sb_04
+sb_06
+ioc0_01
+sb_08
+sb_07
+vuart_01
+sb_02
+ioc0_02
+sb_01
+vuart_02
+sb_03
+sb_05
+linux ppc64
+started

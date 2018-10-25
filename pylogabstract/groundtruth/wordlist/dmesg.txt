@@ -1,3 +1,27 @@
+dev=2(sb_06) &AND& miss
+dev=2(sb_08) &AND& miss
+dev=7(sb_01) &AND& miss
+dev=8(sb_03) &AND& miss
+dev=3(sb_04) &AND& miss
+dev=1(sb_05) &AND& miss
+dev=1(sb_07) &AND& miss
+dev=9(ioc0_02) &AND& miss
+dev=6(sb_02) &AND& miss
+dev=5(vuart_02) &AND& miss
+dev=10(ioc0_01) &AND& miss
+dev=9(ioc0_02) &AND& match
+dev=10(ioc0_01) &AND& match
+dev=5(vuart_02) &AND& match
+dev=6(sb_02) &AND& match
+dev=7(sb_01) &AND& match
+dev=2(sb_06) &AND& match
+dev=2(sb_08) &AND& match
+dev=1(sb_05) &AND& match
+dev=1(sb_07) &AND& match
+dev=3(sb_04) &AND& match
+dev=8(sb_03) &AND& match
+dev=11(lpm_01)
+dev=4(vuart_01)
 initializing cgroup subsys
 linux version
 bios-provided physical ram map
@@ -87,7 +111,7 @@ cpu0: intel
 brought up 
 total of 
 attaching sched-domain:
-]  domain
+: span
 ]   groups: 
 net_namespace: 
 booting paravirtualized kernel on bare hardware
@@ -260,11 +284,7 @@ aux port at
 nothing has been logged yet
 disabled privacy extensions
 ] adding
-ps3_system_bus_match
-ps3_system_bus_probe
 ps3 sound started
-dell dell usb keyboard
-logitech optical usb
 hci usb driver
 hci socket layer initialized
 hci device and connection
@@ -295,7 +315,6 @@ of video memory
 switching to colour frame buffer device
 total hugetlb memory
 cpu hotplug not supported
-linux ppc64
 ibm ebus device driver
 ]    groups:
 ]   domain
@@ -332,7 +351,7 @@ for crashkernel (system ram:
 crash kernel location must be
 -----------------------------------------------------
 *** 0000 : cf
-*** 0000 : #1 smp
+#1 smp
 swap on /dev
 generic bluetooth usb driver
 ps3_lpm_probe:
@@ -492,7 +511,6 @@ _spin_unlock_irqrestore
 release_console_sem
 printk
 mtrr_wrmsr
-printk
 mtrr_trim_uncached_memory
 setup_arch
 start_kernel
@@ -506,3 +524,24 @@ it is
 (acpi nvs)
 (acpi data)
 probing pci hardware
+as /class/input/input
+unknown partition table
+read capacity failed
+sense not available
+kernel logging (proc)
+kernel log daemon
+unrecovered read error
+verify of flash database failed
+sb_04
+sb_06
+ioc0_01
+sb_08
+sb_07
+vuart_01
+sb_02
+ioc0_02
+sb_01
+vuart_02
+sb_03
+sb_05
+linux ppc64

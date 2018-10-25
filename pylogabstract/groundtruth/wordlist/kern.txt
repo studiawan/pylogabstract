@@ -1,3 +1,27 @@
+dev=2(sb_06) &AND& miss
+dev=2(sb_08) &AND& miss
+dev=7(sb_01) &AND& miss
+dev=8(sb_03) &AND& miss
+dev=3(sb_04) &AND& miss
+dev=1(sb_05) &AND& miss
+dev=1(sb_07) &AND& miss
+dev=9(ioc0_02) &AND& miss
+dev=6(sb_02) &AND& miss
+dev=5(vuart_02) &AND& miss
+dev=10(ioc0_01) &AND& miss
+dev=9(ioc0_02) &AND& match
+dev=10(ioc0_01) &AND& match
+dev=5(vuart_02) &AND& match
+dev=6(sb_02) &AND& match
+dev=7(sb_01) &AND& match
+dev=2(sb_06) &AND& match
+dev=2(sb_08) &AND& match
+dev=1(sb_05) &AND& match
+dev=1(sb_07) &AND& match
+dev=3(sb_04) &AND& match
+dev=8(sb_03) &AND& match
+dev=11(lpm_01)
+dev=4(vuart_01)
 kernel: inspecting
 cannot find map file
 symbols from
@@ -116,7 +140,7 @@ cpu0: intel
 brought up 
 total of 
 attaching sched-domain:
-]  domain
+: span
 ]   groups: 
 net_namespace: 
 booting paravirtualized kernel on bare hardware
@@ -345,7 +369,7 @@ for crashkernel (system ram:
 crash kernel location must be
 -----------------------------------------------------
 *** 0000 : cf
-*** 0000 : #1 smp
+#1 smp
 swap on /dev
 generic bluetooth usb driver
 ps3_lpm_probe:
@@ -525,8 +549,6 @@ transparent bridge
 (acpi data)
 pme# supported from
 could not be reserved
-ps3_system_bus_probe
-ps3_system_bus_match
 unknown partition table
 read capacity failed
 hostbyte=
@@ -539,8 +561,6 @@ symbols match kernel
 no bss matched
 registered misc device
 hci usb driver
-logitech optical usb
-dell usb keyboard
 driver loaded but no devices
 unrecovered read error
 i/o error, dev sda
@@ -562,3 +582,16 @@ read() failed: success
 daemon startup failed.
 ps3da5 >
 link becomes ready
+sb_04
+sb_06
+ioc0_01
+sb_08
+sb_07
+vuart_01
+sb_02
+ioc0_02
+sb_01
+vuart_02
+sb_03
+sb_05
+as /class/input/input
