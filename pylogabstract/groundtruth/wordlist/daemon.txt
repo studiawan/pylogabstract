@@ -16,9 +16,9 @@ failed to find bluetooth netlink family
 can't init plugin
 bridge pan0
 <info>  starting... 
-eth0: driver is
+driver is
 found new ethernet device
-(eth0): exported as
+exported as
 trying to start
 scplugin-ifupdown: init!
 scplugin-ifupdown: update_system_hostname
@@ -36,7 +36,7 @@ preparing device
 deactivating device
 adding default connection
 unable to find provider
-carrier now on
+carrier now
 device state change
 activation (eth0) starting connection
 (device prepare)
@@ -84,7 +84,7 @@ external fuse
 value location for
 instance of invalid non-instantiatable type
 assertion
-hal disappeared
+<info>  hal
 disconnected by the system
 disconnected from the system bus
 devices removed
@@ -92,10 +92,8 @@ registered interface
 hci dev 0
 has been enabled
 starting security manager
-wlan0: driver is
 driver does not support
 found new
-(wlan0): exported as
 guessed connection type
 update_connection_setting_from_if_block
 addresses count:
@@ -115,7 +113,6 @@ no longer relevant for mdns
 withdrawing address record for
 instance with invalid (null)
 files changed, reloading
-hal re-appeared
 no working leases in persistent database
 can't create gn bridge
 driver supports ssid

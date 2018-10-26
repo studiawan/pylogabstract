@@ -20,6 +20,7 @@ dev=1(sb_05) &AND& match
 dev=1(sb_07) &AND& match
 dev=3(sb_04) &AND& match
 dev=8(sb_03) &AND& match
+using &AND& routing
 dev=11(lpm_01)
 dev=4(vuart_01)
 ubuntu syslogd
@@ -229,7 +230,6 @@ host controller
 new usb bus registered
 debug port
 cache line size of
-usb usb1: configuration
 usb hub found
 , io mem
 usb 2.0 started,
@@ -294,8 +294,7 @@ itco_wdt: initialized
 : agp aperture is
 standard hot plug pci controller
 fwh not detected
-input: power button
-acpi: power button
+button (ff)
 reported by plug and play acpi
 pc-style at
 pc speaker as
@@ -494,9 +493,7 @@ nic link is up
 is already registered
 generic explorer mouse as
 battery slot
-ac adapter 
-acpi: sleep button
-input: sleep button
+ac adapter
 sata link up
 sata max udma
 scsi0 : ahci
@@ -535,9 +532,7 @@ warn_on_slowpath
 _spin_lock_irqsave
 _spin_unlock_irqrestore
 release_console_sem
-printk
 mtrr_wrmsr
-printk
 mtrr_trim_uncached_memory
 setup_arch
 start_kernel
@@ -608,3 +603,9 @@ vuart_02
 sb_03
 sb_05
 linux ppc64
+activating isa
+nic link is down
+2 intl 20050309
+1 asl        61
+] vprintk
+] printk

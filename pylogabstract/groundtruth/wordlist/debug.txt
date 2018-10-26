@@ -7,8 +7,7 @@ used by override
 mapped
 nr_cpus:
 cpa: page pool initialized 
-cpu0 attaching sched-domain:
-domain 0:
+attaching sched-domain:
 groups: 0
 acpi: ec: look up ec in dsdt
 32bit mmio:
@@ -38,8 +37,7 @@ entering add_active_range
 time_init: 
 clockevent: decrementer mult
 calibrating delay loop
-domain 1: span
-attaching sched-domain
+: span
 probing pci hardware
 driver hvc_console registering
 hvsi: registered

@@ -20,6 +20,7 @@ dev=1(sb_05) &AND& match
 dev=1(sb_07) &AND& match
 dev=3(sb_04) &AND& match
 dev=8(sb_03) &AND& match
+using &AND& routing
 dev=11(lpm_01)
 dev=4(vuart_01)
 kernel: inspecting
@@ -224,12 +225,11 @@ processor acpi
 usbcore: registered new
 pci int d
 setting latency timer
-ehci host controller
 new usb bus registered
 debug port
 cache line size of
 usb universal host controller interface driver
-usb usb1: configuration
+chosen from
 usb hub found
 , io mem
 usb 2.0 started,
@@ -238,7 +238,7 @@ no dock devices found
 scsi subsystem initialized
 libata version
 : pci int
-uhci host controller
+host controller
 , io base
 chosen from
 speed usb device using
@@ -296,8 +296,7 @@ itco_wdt: initialized
 : agp aperture is
 standard hot plug pci controller
 fwh not detected
-input: power button
-acpi: power button
+button (ff)
 reported by plug and play acpi
 pc-style at
 pc speaker as
@@ -314,11 +313,9 @@ internal vlan enabled
 pages for linear map
 starting manual resume from disk
 usb 0.0 started
-ohci host controller
 : ps3rom
 ps3da: ps3da
 is a fujitsu
-'open' host controller
 registered block device major
 usb disconnect,
 initialised: dm-devel
@@ -373,8 +370,7 @@ crash kernel location must be
 swap on /dev
 generic bluetooth usb driver
 ps3_lpm_probe:
-ehci_hcd should always be loaded 
-'enhanced' host controller
+ehci_hcd should always be loaded
 mib of gpu memory
 created ram cache:
 rpc: registered
@@ -527,9 +523,9 @@ warn_on_slowpath
 _spin_lock_irqsave
 _spin_unlock_irqrestore
 release_console_sem
-printk
+] vprintk
 mtrr_wrmsr
-printk
+] printk
 mtrr_trim_uncached_memory
 setup_arch
 start_kernel
@@ -595,3 +591,17 @@ vuart_02
 sb_03
 sb_05
 as /class/input/input
+udma/33 mode
+activating isa
+vbox cd-rom
+setting irq
+nic link is down
+dvd-rom drive
+host max
+switching to runlevel
+caught signal
+killed old client process
+dhcprelease
+there is already
+2 intl 20050309
+1 asl        61

@@ -20,6 +20,7 @@ dev=1(sb_05) &AND& match
 dev=1(sb_07) &AND& match
 dev=3(sb_04) &AND& match
 dev=8(sb_03) &AND& match
+using &AND& routing
 dev=11(lpm_01)
 dev=4(vuart_01)
 initializing cgroup subsys
@@ -131,7 +132,6 @@ acpi: pci root bridge
 io port:
 ] cpu:
 claimed by
-irq routing
 * the chipset may have pm-timer bug
 * this clock source is slow
 * this bug, please use
@@ -203,7 +203,6 @@ setting latency timer
 new usb bus registered
 debug port
 cache line size of
-usb usb1: configuration
 usb hub found
 , io mem
 usb 2.0 started,
@@ -268,8 +267,6 @@ itco_wdt: initialized
 : agp aperture is
 standard hot plug pci controller
 fwh not detected
-input: power button
-acpi: power button
 reported by plug and play acpi
 pc-style at
 pc speaker as
@@ -454,7 +451,6 @@ no numa configuration found
 srat: node
 acpi: srat
 acpi: mcfg
-acpi: xsdt
 dmi present
 end_pfn_map = 
 command line:
@@ -469,8 +465,7 @@ is already registered
 generic explorer mouse as
 battery slot
 ac adapter 
-acpi: sleep button
-input: sleep button
+button (ff)
 sata link up
 sata max udma
 scsi0 : ahci
@@ -509,7 +504,8 @@ warn_on_slowpath
 _spin_lock_irqsave
 _spin_unlock_irqrestore
 release_console_sem
-printk
+] printk
+] vprintk
 mtrr_wrmsr
 mtrr_trim_uncached_memory
 setup_arch
@@ -545,3 +541,18 @@ vuart_02
 sb_03
 sb_05
 linux ppc64
+activating isa
+setting irq
+udma/33 mode
+vbox cd-rom
+nic link is down
+dvd-rom drive
+host max
+switching to runlevel
+caught signal
+killed old client process
+dhcprelease
+there is already
+2 intl 20050309
+1 asl        61
+(r2 vbox  )
