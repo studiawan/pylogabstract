@@ -65,13 +65,13 @@ class Parser(object):
         parsed_logs = OrderedDict()
         with open(log_file) as f:
             for line_index, line in enumerate(f):
-                raw_logs[line_index] = line
+                if line not in ['\n', '\r\n']:
+                    raw_logs[line_index] = line
+                    words_raw = line.strip().split()
 
-                words_raw = line.strip().split()
-                ner_label = self.model.predict(words_raw)
-
-                parsed = self.__get_per_entity(words_raw, ner_label)
-                parsed_logs[line_index] = parsed
+                    ner_label = self.model.predict(words_raw)
+                    parsed = self.__get_per_entity(words_raw, ner_label)
+                    parsed_logs[line_index] = parsed
 
         return parsed_logs, raw_logs
 
