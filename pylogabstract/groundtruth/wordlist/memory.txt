@@ -5,8 +5,8 @@ trusting ca cert from
 ovsdb-server (open vswitch)
 peak resident set size
 memory info cells
-connection dropped (connection r
-connection dropped (protocol error)
+connection dropped (c
+connection dropped (p
 routines:ssl3_read_bytes:tlsv1 alert unknown
 log messages in last
 normalization changed
@@ -90,3 +90,11 @@ nln_changed
 events never hit
 netdev_set_hwaddr
 netdev_set_ethtool
+monitors:
+post: ip
+pre: ip
+died, killed (terminated)
+terminating with
+event coverage
+handlers:
+: c
