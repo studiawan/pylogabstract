@@ -132,7 +132,7 @@ class Experiment(object):
         metrics = self.__get_evaluation_metrics(properties['lineid_abstractionid_path'],
                                                 lineid_abstractionid_prediction)
         evaluation_metrics = (filename, metrics['precision'], metrics['recall'], metrics['f1'], metrics['accuracy'])
-        print('accuracy:', metrics['accuracy'])
+        print('Accuracy :', metrics['accuracy'], '\n')
 
         return evaluation_metrics
 
