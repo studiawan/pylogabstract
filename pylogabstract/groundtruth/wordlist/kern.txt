@@ -20,6 +20,8 @@ dev=1(sb_05) &AND& match
 dev=1(sb_07) &AND& match
 dev=3(sb_04) &AND& match
 dev=8(sb_03) &AND& match
+dev=11.0(lpm_01) &AND& match
+dev=10.2(ioc0_03) &AND& match
 using &AND& routing
 dev=11(lpm_01)
 dev=4(vuart_01)
@@ -605,3 +607,23 @@ dhcprelease
 there is already
 2 intl 20050309
 1 asl        61
+kernel:  sda:
+: connected
+sdb: sdb1
+wrong wep key
+association failed
+activate -->
+[sdb] asc
+hub_port_status failed
+last message repeated
+device descriptor
+device &AND& promiscuous mode
+module license 'unspecified'
+sense key :
+i/o error, dev
+maximal mount count reached
+system ram resource
+section number
+lost page write
+---offsets---
+kernel: [    0.

@@ -20,6 +20,8 @@ dev=1(sb_05) &AND& match
 dev=1(sb_07) &AND& match
 dev=3(sb_04) &AND& match
 dev=8(sb_03) &AND& match
+dev=11.0(lpm_01) &AND& match
+dev=10.2(ioc0_03) &AND& match
 using &AND& routing
 dev=11(lpm_01)
 dev=4(vuart_01)
@@ -766,3 +768,23 @@ dhcprelease
 there is already
 2 intl 20050309
 1 asl        61
+activate -->
+can't remove gn bridge
+hub_port_status failed
+on behalf of uid
+no working leases in persistent
+forcibly attempting
+device eth0 &AND& promiscuous mode
+driver supports ssid
+system ram resource
+section number
+couldn't authenticate user
+trying recorded lease
+hub_port_status failed
+device descriptor
+rtnetlink answers:
+network is down
+no working leases
+trash directory
+can't create gn bridge
+kernel: [    0.
