@@ -26,6 +26,7 @@ import time
 import os
 import gc
 import re
+from collections import defaultdict
 
 
 class Partition:
@@ -691,15 +692,20 @@ class IPLoM:
             return p1, p2
 
     def print_partitions(self):
+        abstractions = defaultdict(list)
         for idx in range(len(self.partitions_L)):
             if self.partitions_L[idx].valid:
                 # print ('Partition {}:(from step {}) Valid:{}'.format(idx, self.partitions_L[idx].stepNo,
                 #                                                     self.partitions_L[idx].valid))
 
                 for log in self.partitions_L[idx].logLL:
-                    print(log[-2])
+                    print(log[-2], log[-1])
+                    abstractions[log[-1]].append(log[-2])
                     # get log line number
                 print("*****************************************")
+
+        for k, v in abstractions.items():
+            print(k, v)
 
     def get_clusters(self):
         clusters = {}
@@ -728,6 +734,26 @@ class IPLoM:
         for fileName in file_list:
             os.remove(dir_path + "/" + fileName)
 
+    def get_abstraction(self):
+        # final_abstractions[abstraction_id] = {'abstraction': str, 'log_id': [int, ...]}
+        absid_logid = defaultdict(list)
+        for idx in range(len(self.partitions_L)):
+            if self.partitions_L[idx].valid:
+                for log in self.partitions_L[idx].logLL:
+                    # print(log[-2], log[-1])
+                    absid_logid[int(log[-1])].append(int(log[-2]))
+
+        abstractions = {}
+        abstraction_id = 0
+        for event in self.eventsL:
+            abstractions[abstraction_id] = {
+                'abstraction': event.eventStr,
+                'log_id': absid_logid[event.eventId]
+            }
+            abstraction_id += 1
+
+        return abstractions
+
 if __name__ == '__main__':
     # set input path
     dataset_path = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/'
@@ -735,10 +761,11 @@ if __name__ == '__main__':
     OutputPath = '/home/hudan/Git/pylogabstract/results/misc'
     para = ParaIPLoM(path=dataset_path, logname=analyzed_file, save_path=OutputPath)
 
-    # call IPLoM and get clusters
+    # call IPLoM and get abstractions
     myparser = IPLoM(para)
     time = myparser.main_process()
-    clusters = myparser.get_clusters()
-    original_logs = myparser.logs
-    myparser.print_partitions()
-    myparser.print_event_stats()
+    final_abstractions = myparser.get_abstraction()
+    for k, v in final_abstractions.items():
+        print(k, v)
+
+    print('Time:', time)
