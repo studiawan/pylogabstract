@@ -1,11 +1,13 @@
 import os
 import errno
 import csv
+import sys
 from configparser import ConfigParser
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from pylogabstract.abstraction.abstraction import LogAbstraction
 from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
+from pylogabstract.misc.iplom import IPLoM, ParaIPLoM
 
 
 class Experiment(object):
@@ -111,12 +113,28 @@ class Experiment(object):
         abstractions, raw_logs = self.log_abstraction.get_abstraction(log_path)
         return abstractions, raw_logs
 
+    @staticmethod
+    def __run_iplom(log_path):
+        log_path_split = log_path.split('/')
+        directory = '/'.join(log_path_split[:-1]) + '/'
+        filename = log_path_split[-1]
+        para = ParaIPLoM(path=directory, logname=filename)
+
+        iplom = IPLoM(para)
+        iplom.main_process()
+        abstractions, raw_logs = iplom.get_abstraction()
+
+        return abstractions, raw_logs
+
     def __get_abstraction(self, filename, properties):
         # run experiment: get abstraction
         abstractions = {}
         raw_logs = {}
         if self.method == 'pylogabstract':
             abstractions, raw_logs = self.__run_pylogabstract(properties['log_path'])
+
+        elif self.method == 'iplom':
+            abstractions, raw_logs = self.__run_iplom(properties['log_path'])
 
         # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
@@ -161,11 +179,20 @@ class Experiment(object):
 
 
 if __name__ == '__main__':
-    abstraction_method = 'pylogabstract'
+    abstraction_list = ['pylogabstract', 'iplom']
     dataset_list = ['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal',
-                    'dfrws-2016', 'honeynet-challenge5', 'honeynet-challenge7']
-    dataset_name = dataset_list[0]
-    conf_file = ''
+                    'honeynet-challenge5', 'honeynet-challenge7']
 
-    experiment = Experiment(abstraction_method, dataset_name, conf_file)
-    experiment.run_abstraction_serial()
+    if len(sys.argv) < 3:
+        print('Please input abstraction method and dataset name.')
+        print('Supported methods :', abstraction_list)
+        print('Supported datasets:', dataset_list)
+        sys.exit(1)
+
+    else:
+        abstraction_method = sys.argv[1]
+        dataset_name = sys.argv[2]
+        conf_file = ''
+
+        experiment = Experiment(abstraction_method, dataset_name, conf_file)
+        experiment.run_abstraction_serial()
