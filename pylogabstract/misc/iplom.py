@@ -98,7 +98,7 @@ class IPLoM:
         self.partitions_L = []
         self.eventsL = []
         self.output = []
-        self.logs = []
+        self.logs = {}
 
         # Initialize some partitions which contain logs with different length
         for logLen in range(self.para.maxEventLen + 1):
@@ -136,7 +136,7 @@ class IPLoM:
         with open(self.para.path + self.para.logname) as lines:
             line_count = 1
             for line in lines:
-                self.logs.append(line)
+                self.logs[line_count] = line
                 # If line is empty, skip
                 if line.strip() == "":
                     continue
@@ -747,12 +747,12 @@ class IPLoM:
         abstraction_id = 0
         for event in self.eventsL:
             abstractions[abstraction_id] = {
-                'abstraction': event.eventStr,
+                'abstraction': ' '.join(event.eventStr),
                 'log_id': absid_logid[event.eventId]
             }
             abstraction_id += 1
 
-        return abstractions
+        return abstractions, self.logs
 
 if __name__ == '__main__':
     # set input path
@@ -764,7 +764,7 @@ if __name__ == '__main__':
     # call IPLoM and get abstractions
     myparser = IPLoM(para)
     time = myparser.main_process()
-    final_abstractions = myparser.get_abstraction()
+    final_abstractions, rawlogs = myparser.get_abstraction()
     for k, v in final_abstractions.items():
         print(k, v)
 
