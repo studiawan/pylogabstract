@@ -611,3 +611,4 @@ nic link is down
 1 asl        61
 ] vprintk
 ] printk
+no amd northbridge

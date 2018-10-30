@@ -627,3 +627,17 @@ section number
 lost page write
 ---offsets---
 kernel: [    0.
+]  sda5 >
+enabling device 
+no amd northbridge
+tcpdump uses obsolete
+segfault at
+port disabled
+can't update cmos clock from
+type=1503 operation="inode_permission"
+if a device doesn't work
+dev=eth3 prom=
+dev=eth4 prom=
+dev=lo prom=
+in=eth4 out= mac=
+] pci: bridge:

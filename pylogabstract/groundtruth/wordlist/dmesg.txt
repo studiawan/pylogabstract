@@ -558,3 +558,7 @@ there is already
 2 intl 20050309
 1 asl        61
 (r2 vbox  )
+no amd northbridge
+if a device doesn't work
+] pci: bridge:
+rsdp signature

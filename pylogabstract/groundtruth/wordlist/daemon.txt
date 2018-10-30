@@ -240,3 +240,7 @@ mysqld process hanging
 ]: ok 
 switching to runlevel:
 un-registering and exiting
+app-1 dhclient:
+app-1 mysqld_safe[
+app-1 mysqld[
+app-1 /etc/mysql/debian-start[
