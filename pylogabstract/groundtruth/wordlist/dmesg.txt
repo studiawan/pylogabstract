@@ -25,6 +25,8 @@ dev=10.2(ioc0_03) &AND& match
 using &AND& routing
 dev=11(lpm_01)
 dev=4(vuart_01)
+(r1 ptltd
+intel  440bx
 initializing cgroup subsys
 linux version
 bios-provided physical ram map
@@ -39,6 +41,8 @@ dmi 2.3 present.
 (r1 dell
 (r1   dell
 (r0
+rsdp signature
+(r2 ptltd
 acpi: facs
 highmem available
 lowmem available
@@ -385,6 +389,7 @@ link is not ready
 sda: sda1
 allocate port service
 assign_interrupt_mode found msi
+window: disabled.
  window:
 registered nosave memory region:
 nf_conntrack version 
@@ -404,17 +409,15 @@ attempting manual resume
 cache data unavailable
 network connection
 wide scsi
-ending domain validation
 domain validation skipping write
-beginning domain validation
+domain validation
 : capabilities=
 is a post-
 floppy drive(s):
 initiating bringup
-intel corporation
 network driver - version
 fusion mpt spi host driver
-lsi corporation
+copyright (c)
 fusion mpt base driver
 ] (supports
 : supports
@@ -434,8 +437,9 @@ acpi: dmi board name:
 acpi: dmi bios vendor:
 acpi: dmi bios date:
 query ignored
-apic timer
 apic timer calibration result
+apic timer interrupts
+apic timer.
 looking for dsdt in initramfs
 early unpacking initramfs
 failure registering capabilities with primary
@@ -561,4 +565,3 @@ there is already
 no amd northbridge
 if a device doesn't work
 ] pci: bridge:
-rsdp signature

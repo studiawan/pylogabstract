@@ -23,6 +23,8 @@ dev=8(sb_03) &AND& match
 dev=11.0(lpm_01) &AND& match
 dev=10.2(ioc0_03) &AND& match
 using &AND& routing
+(r1 ptltd
+intel  440bx
 dev=11(lpm_01)
 dev=4(vuart_01)
 ubuntu syslogd
@@ -59,6 +61,7 @@ ramdisk:
 allocated new ramdisk:
 move ramdisk from
 dmi 2.3 present.
+rsdp signature
 acpi: rsdp
 acpi: facs
 (r1 dell
@@ -181,6 +184,8 @@ pages allocated for
 actual entries
 apparmor: apparmor 
 acpi: rtc can wake
+ioport range &AND& has been reserved
+iomem range &AND& has been reserved
 has been reserved
 tcp: hash tables configured
 tcp reno registered
@@ -414,6 +419,7 @@ link is not ready
 sda: sda1
 allocate port service
 assign_interrupt_mode found msi
+window: disabled
 window:
 registered nosave memory region:
 nf_conntrack version 
@@ -433,17 +439,15 @@ attempting manual resume
 cache data unavailable
 network connection
 wide scsi
-ending domain validation
 domain validation skipping write
-beginning domain validation
+domain validation
 : capabilities=
 is a post-
 floppy drive(s):
 initiating bringup
-intel corporation
+copyright (c)
 network driver - version
 fusion mpt spi host driver
-lsi corporation
 fusion mpt base driver
 ] (supports
 unable to open rtc device
@@ -462,8 +466,9 @@ acpi: dmi board name:
 acpi: dmi bios vendor:
 acpi: dmi bios date:
 query ignored
-apic timer
 apic timer calibration result
+apic timer interrupts
+apic timer.
 looking for dsdt in initramfs
 early unpacking initramfs
 failure registering capabilities with primary
@@ -566,10 +571,9 @@ kernel:  sdb: sdb1
 off: module license
 ---offsets---
 kernel:  sda:
-syslog-ng starting up
+syslog-ng &AND& version='3.0.5'
 : segfault at
 termination requested
-syslog-ng shutting down
 kernel: imklog
 origin software="rsyslogd"
 hdc: vbox cd-rom

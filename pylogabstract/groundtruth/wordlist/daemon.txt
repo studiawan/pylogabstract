@@ -49,7 +49,8 @@ copyright
 all rights reserved
 for info, please visit
 device eth0 state changed
-listening on
+listening on &AND& enabled
+listening on &AND& disabled
 sending on
 dhcpdiscover
 dhcpoffer
@@ -165,6 +166,7 @@ collectd was terminated
 ]:  the tables
 improperly closed tables
 client is using or hasn't closed
+django.experiments_dailyconversionreportgoaldata
 django.experiments_dailyconversion
 mysqlcheck has found corrupt tables
 bad udp checksums in
@@ -215,7 +217,6 @@ doublewrite buffer not found
 doublewrite buffer created
 creating foreign key constraint
 foreign key constraint system
-running 'mysqlcheck'...
 mysql.columns_priv
 mysql.db
 mysql.func
