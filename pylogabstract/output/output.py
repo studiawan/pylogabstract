@@ -41,7 +41,7 @@ class Output(object):
         for abstraction_id, abstraction in abstractions_prediction.items():
             new_id = -1
             for groundtruth_id, groundtruth_abstraction in abstraction_withid.items():
-                if abstraction['abstraction'].rstrip() == groundtruth_abstraction:
+                if abstraction['abstraction'].strip() == groundtruth_abstraction.strip():
                     new_id = groundtruth_id
 
             # if id exist, write abstractions side by side
@@ -50,7 +50,10 @@ class Output(object):
                 f_comparison.write('\nGround truth: ' + abstraction_withid[new_id] + '\n')
                 for line_id, abs_id in abstractions_groundtruth.items():
                     if abs_id == new_id:
-                        f_comparison.write(str(line_id) + ' ' + raw_logs[line_id])
+                        try:
+                            f_comparison.write(str(line_id) + ' ' + raw_logs[line_id])
+                        except KeyError:
+                            print('KeyError: line id', line_id)
 
                 # write prediction
                 f_comparison.write('\nPrediction  : ' + abstraction['abstraction'] + '\n')
