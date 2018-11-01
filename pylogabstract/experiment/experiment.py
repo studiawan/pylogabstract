@@ -8,6 +8,7 @@ from pylogabstract.abstraction.abstraction import LogAbstraction
 from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
 from pylogabstract.misc.iplom import IPLoM, ParaIPLoM
+from pylogabstract.misc.logsig import LogSig, ParaLogSig
 
 
 class Experiment(object):
@@ -126,6 +127,42 @@ class Experiment(object):
 
         return abstractions, raw_logs
 
+    @staticmethod
+    def __run_logsig(log_path, groundtruth_file, abstraction_withid_path):
+        # get input
+        log_path_split = log_path.split('/')
+        directory = '/'.join(log_path_split[:-1]) + '/'
+        filename = log_path_split[-1]
+
+        # get ground truth
+        groundtruth = AbstractionUtility.read_json(groundtruth_file)
+        groundtruth_list = list(groundtruth.values())
+
+        # run LogSig with k = [2, 3, ... 10]
+        # choose k that provides the best accuracy
+        best_abstractions, raw_logs = {}, {}
+        best_accuracy = 0.
+        for cluster_number in range(10, 21):
+            # run LogSig
+            para = ParaLogSig(path=directory, logname=filename, groupNum=cluster_number)
+            logsig = LogSig(para)
+            logsig.mainProcess()
+            abstractions, raw_logs = logsig.get_abstractions()
+
+            # get accuracy
+            lineid_abstractionid_prediction = \
+                AbstractionUtility.get_abstractionid_from_groundtruth(abstraction_withid_path, abstractions)
+            prediction_list = list(lineid_abstractionid_prediction.values())
+            accuracy = accuracy_score(groundtruth_list, prediction_list)
+
+            # get the best accuracy
+            print(accuracy)
+            if best_accuracy < accuracy:
+                best_accuracy = accuracy
+                best_abstractions = abstractions
+
+        return best_abstractions, raw_logs
+
     def __get_abstraction(self, filename, properties):
         # run experiment: get abstraction
         abstractions = {}
@@ -136,7 +173,12 @@ class Experiment(object):
         elif self.method == 'iplom':
             abstractions, raw_logs = self.__run_iplom(properties['log_path'])
 
-        # write result to file
+        elif self.method == 'logsig':
+            abstractions, raw_logs = self.__run_logsig(properties['log_path'],
+                                                       properties['lineid_abstractionid_path'],
+                                                       properties['abstraction_withid_path'])
+
+            # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
         Output.write_perabstraction(abstractions, raw_logs, properties['perabstraction_path'])
         Output.write_comparison(properties['abstraction_withid_path'], properties['lineid_abstractionid_path'],
@@ -179,12 +221,13 @@ class Experiment(object):
 
 
 if __name__ == '__main__':
-    abstraction_list = ['pylogabstract', 'iplom']
+    abstraction_list = ['pylogabstract', 'iplom', 'logsig']
     dataset_list = ['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal',
                     'honeynet-challenge5', 'honeynet-challenge7']
 
     if len(sys.argv) < 3:
         print('Please input abstraction method and dataset name.')
+        print('experiment.py method_name dataset_name')
         print('Supported methods :', abstraction_list)
         print('Supported datasets:', dataset_list)
         sys.exit(1)
