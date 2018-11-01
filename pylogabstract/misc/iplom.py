@@ -136,33 +136,34 @@ class IPLoM:
         with open(self.para.path + self.para.logname) as lines:
             line_count = 1
             for line in lines:
-                self.logs[line_count] = line
-                # If line is empty, skip
-                if line.strip() == "":
-                    continue
+                if line not in ['\n', '\r\n']:
+                    self.logs[line_count - 1] = line
+                    # If line is empty, skip
+                    if line.strip() == "":
+                        continue
 
-                if self.para.regular:
-                    for currentRex in self.para.rex:
-                        line = re.sub(currentRex, '', line)
-                    line = re.sub('node-[0-9]+', 'node-', line)  # For HPC only
+                    if self.para.regular:
+                        for currentRex in self.para.rex:
+                            line = re.sub(currentRex, '', line)
+                        line = re.sub('node-[0-9]+', 'node-', line)  # For HPC only
 
-                word_seq = line.strip().split()
-                # word_seq = line.strip().split('\t')[1].split()
-                # print (wordSeq)
-                if self.para.removable:
-                    word_seq = [word for i, word in enumerate(word_seq) if i not in self.para.removeCol]
-                # print (wordSeq)
+                    word_seq = line.strip().split()
+                    # word_seq = line.strip().split('\t')[1].split()
+                    # print (wordSeq)
+                    if self.para.removable:
+                        word_seq = [word for i, word in enumerate(word_seq) if i not in self.para.removeCol]
+                    # print (wordSeq)
 
-                # Generate terms list, with ID in the end
-                word_seq.append(str(line_count))
-                # print (wordSeq)
-                line_count += 1
-                # if lineCount%100 == 0:
-                # 	print(lineCount)
+                    # Generate terms list, with ID in the end
+                    word_seq.append(str(line_count))
+                    # print (wordSeq)
+                    line_count += 1
+                    # if lineCount%100 == 0:
+                    # 	print(lineCount)
 
-                # Add current log to the corresponding partition
-                self.partitions_L[len(word_seq) - 1].logLL.append(word_seq)
-                self.partitions_L[len(word_seq) - 1].numOfLogs += 1
+                    # Add current log to the corresponding partition
+                    self.partitions_L[len(word_seq) - 1].logLL.append(word_seq)
+                    self.partitions_L[len(word_seq) - 1].numOfLogs += 1
 
             for partition in self.partitions_L:
                 if partition.numOfLogs == 0:
@@ -740,15 +741,15 @@ class IPLoM:
         for idx in range(len(self.partitions_L)):
             if self.partitions_L[idx].valid:
                 for log in self.partitions_L[idx].logLL:
-                    # print(log[-2], log[-1])
-                    absid_logid[int(log[-1])].append(int(log[-2]))
+                    # print(int(log[-2]) - 1, int(log[-1]) - 1)
+                    absid_logid[int(log[-1]) - 1].append(int(log[-2]) - 1)  # zero-based index
 
         abstractions = {}
         abstraction_id = 0
         for event in self.eventsL:
             abstractions[abstraction_id] = {
                 'abstraction': ' '.join(event.eventStr),
-                'log_id': absid_logid[event.eventId]
+                'log_id': absid_logid[event.eventId - 1]
             }
             abstraction_id += 1
 
