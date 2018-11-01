@@ -29,7 +29,7 @@ import gc
 # rex=['([0-9]+\.){3}[0-9]'],savePath='./results_2kHPC/',saveFileName='template',groupNum=51):# line 67,change the regular expression replacement code
 # ******************************************************************************************
 
-class Para:
+class ParaLogSig:
     def __init__(self, path='', logname='', removable=True, removeCol=[],
                  regular=True,
                  rex=[], savePath='',
@@ -56,6 +56,8 @@ class LogSig:
         self.groupIndex = dict()  # each line corresponding to which group
         self.termPairLogNumLD = []
         self.logIndexPerGroup = []
+        self.logs = {}
+        self.abstractions = {}
 
     # Load datasets and use regular expression to split it and remove some columns
     def termpairGene(self):
@@ -63,17 +65,22 @@ class LogSig:
         # print(self.para.path + self.para.logname)
         # print(self.para.regular)
         # print(self.para.groupNum)
+        line_index = 0
         with open(self.para.path + self.para.logname) as lines:
             for line in lines:
-                if self.para.regular:
-                    for currentRex in self.para.rex:
-                        line = re.sub(currentRex, '', line)
-                        # line=re.sub(currentRex,'core.',line) # For BGL data only
-                        # line=re.sub('node-[0-9]+','node-',line) #For HPC only
-                wordSeq = line.strip().split()
-                if self.para.removable:
-                    wordSeq = [word for i, word in enumerate(wordSeq) if i not in self.para.removeCol]
-                self.wordLL.append(tuple(wordSeq))
+                if line not in ['\n', '\r\n']:
+                    self.logs[line_index] = line
+                    line_index += 1
+
+                    if self.para.regular:
+                        for currentRex in self.para.rex:
+                            line = re.sub(currentRex, '', line)
+                            # line=re.sub(currentRex,'core.',line) # For BGL data only
+                            # line=re.sub('node-[0-9]+','node-',line) #For HPC only
+                    wordSeq = line.strip().split()
+                    if self.para.removable:
+                        wordSeq = [word for i, word in enumerate(wordSeq) if i not in self.para.removeCol]
+                    self.wordLL.append(tuple(wordSeq))
 
     # initialize different variables
     def initialization(self):
@@ -154,11 +161,14 @@ class LogSig:
     # calculate the occurancy of each word of each group, and for each group, save the words that
     # happen more than half all log number to be candidateTerms(list of dict, words:frequency),
     def signatConstr(self):
+        abstractions = {}
+        abstraction_id = 0
+
         # create the folder to save the resulted templates
-        if not os.path.exists(self.para.savePath):
-            os.makedirs(self.para.savePath)
-        else:
-            deleteAllFiles(self.para.savePath)
+        # if not os.path.exists(self.para.savePath):
+        #     os.makedirs(self.para.savePath)
+        # else:
+        #     deleteAllFiles(self.para.savePath)
 
         wordFreqPerGroup = []
         candidateTerm = []
@@ -219,13 +229,21 @@ class LogSig:
             sig = max(candidateSeq[i].items(), key=operator.itemgetter(1))[0]
             # sig=max(candidateSeq[i].iteritems(), key=operator.itemgetter(1))[0]
             signature.append(sig)
-        # print(signature)
+
+            # save abstractions == signatures
+            abstractions[abstraction_id] = {
+                'abstraction': ' '.join(sig),
+                'log_id': self.logIndexPerGroup[i]
+            }
+            abstraction_id += 1
 
         # save the templates
-        with open(self.para.savePath + 'logTemplates.txt', 'w') as fi:
-            for j in range(len(signature)):
-                # pjhe
-                fi.write(' '.join(signature[j]) + '\n')
+        # with open(self.para.savePath + 'logTemplates.txt', 'w') as fi:
+        #     for j in range(len(signature)):
+        #         # pjhe
+        #         fi.write(' '.join(signature[j]) + '\n')
+
+        return abstractions
 
     # save the grouped loglines into different templates.txt
     def templatetxt(self):
@@ -233,16 +251,18 @@ class LogSig:
             numLogOfEachGroup = self.logIndexPerGroup[i]
             with open(self.para.savePath + self.para.saveFileName + str(i + 1) + '.txt', 'w') as f:
                 for log_ID in numLogOfEachGroup:
+                    print(log_ID, self.logs[log_ID].rstrip())
                     f.write(str(log_ID + 1) + '\n')
+                print('---')
 
     def mainProcess(self):
         self.termpairGene()
         t1 = time.time()
         self.initialization()
         self.LogMessParti()
-        # self.signatConstr()
+        self.abstractions = self.signatConstr()
         timeInterval = time.time() - t1
-        self.templatetxt()
+        # self.templatetxt()
         # print('this process takes', timeInterval)
         # print('*********************************************')
         gc.collect()
@@ -260,6 +280,9 @@ class LogSig:
                 clusters[cluster_id].append(log_id)
 
         return clusters
+
+    def get_abstractions(self):
+        return self.abstractions, self.logs
 
 
 def potenFunc(curGroupIndex, termPairLogNumLD, logNumPerGroup, lineNum, termpairLT, k):
@@ -300,10 +323,12 @@ if __name__ == '__main__':
     # set input path
     dataset_path = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/'
     analyzed_file = 'auth.log'
-    OutputPath = '/home/hudan/Git/pylogabstract/results/misc'
-    para = Para(path=dataset_path, logname=analyzed_file, savePath=OutputPath)
+    para = ParaLogSig(path=dataset_path, logname=analyzed_file)     # groupNum = default
 
     # call IPLoM and get clusters
     myparser = LogSig(para)
     time = myparser.mainProcess()
-    clusters = myparser.get_clusters()
+    abstractions_result, rawlogs = myparser.get_abstractions()
+
+    for k, v in abstractions_result.items():
+        print(k, v)
