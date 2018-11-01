@@ -209,10 +209,10 @@ class LKE:
         # self.print_each_cluster()
         # self.get_clusters()
         # print clusters
-        # self.splitting()
-        # self.extracting()
+        self.splitting()
+        self.extracting()
         time_interval = time.time() - t1
-        # self.templatetxt()
+        self.templatetxt()
         # print('this process takes', time_interval)
         # print('*********************************************')
         return load_data_time, cal_data_time, time_interval
