@@ -2,8 +2,9 @@ import os
 import errno
 import csv
 import sys
+import statistics
 from configparser import ConfigParser
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import accuracy_score  # precision_score, recall_score, f1_score,
 from pylogabstract.abstraction.abstraction import LogAbstraction
 from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
@@ -98,9 +99,10 @@ class Experiment(object):
         groundtruth_list = list(groundtruth.values())
         prediction_list = list(prediction.values())
 
-        precision = precision_score(groundtruth_list, prediction_list, average='micro')
-        recall = recall_score(groundtruth_list, prediction_list, average='micro')
-        f1 = f1_score(groundtruth_list, prediction_list, average='micro')
+        # precision = precision_score(groundtruth_list, prediction_list, average='micro')
+        # recall = recall_score(groundtruth_list, prediction_list, average='micro')
+        # f1 = f1_score(groundtruth_list, prediction_list, average='micro')
+        precision, recall, f1 = 0, 0, 0
         accuracy = accuracy_score(groundtruth_list, prediction_list)
 
         metrics = {'precision': round(precision, 3),
@@ -210,11 +212,15 @@ class Experiment(object):
         writer.writerow(tuple(header))
 
         # run the experiment
+        accuracy = []
         for filename, properties in self.files.items():
             if filename != 'evaluation_file':
                 print('Processing', filename, '...')
                 metrics = self.__get_abstraction(filename, properties)
                 writer.writerow(metrics)
+                accuracy.append(metrics[4])
+
+        print('Mean accuracy:', statistics.mean(accuracy))
 
         # close evaluation file
         f.close()
@@ -223,7 +229,7 @@ class Experiment(object):
 if __name__ == '__main__':
     abstraction_list = ['pylogabstract', 'iplom', 'logsig']
     dataset_list = ['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal',
-                    'honeynet-challenge5', 'honeynet-challenge7']
+                    'dfrws-2016', 'honeynet-challenge7']
 
     if len(sys.argv) < 3:
         print('Please input abstraction method and dataset name.')
