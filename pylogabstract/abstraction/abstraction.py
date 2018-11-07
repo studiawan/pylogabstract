@@ -109,6 +109,16 @@ class LogAbstraction(object):
                 self.word_check.append(word)
                 word = '*'
 
+            # replace digit and symbol
+            replaced = '1234567890~!@#$%^&*()-_=+{}[]|\\;:'"<>,.?/"
+            word_replace = word
+            for character in replaced:
+                word_replace = word_replace.replace(character, '*')
+
+            if set(word_replace) == {'*'}:
+                self.word_check.append(word)
+                word = '*'
+
         else:
             word = '*'
 
