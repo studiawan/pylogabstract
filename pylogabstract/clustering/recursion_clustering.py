@@ -1,11 +1,13 @@
 import community as commun
 import networkx as nx
+import sys
 from collections import defaultdict
 from networkx.algorithms import community
 from operator import itemgetter
 from pylogabstract.preprocess.preprocess import Preprocess
 from pylogabstract.preprocess.create_graph import CreateGraph
 from pylogabstract.parser.parser import Parser
+from pylogabstract.clustering.force_clustering import ForceClustering
 
 
 class LogClustering(object):
@@ -19,6 +21,9 @@ class LogClustering(object):
         self.raw_logs = raw_logs
         self.partial_message_length_group = partial_message_length_group
         self.partial_event_attributes = partial_event_attributes
+        self.__BOTTOM_DENSITY = 0.8
+        self.__TOP_DENSITY = 1.0
+        self.__MAX_EDGES = 10000
 
     @staticmethod
     def __convert_to_nodeid_clusterid(partition):
@@ -152,26 +157,36 @@ class LogClustering(object):
 
             # create graph for a particular group
             else:
-                # unique_events = self.preprocess.get_partial_unique_events(group)
                 unique_events = self.__get_partial_unique_events(group)
                 graph_model = CreateGraph(unique_events, self.event_attributes, group)
                 graph = graph_model.create_graph()
 
-                # clustering with valid graph only
-                graph = self.__get_valid_graph(message_length, graph)
-                if graph is not None:
-                    clusters = self.__get_graph_cluster(graph)
-                    for index, nodes in clusters.items():
-                        if len(nodes) <= 3:
-                            self.clusters[message_length][self.cluster_id] = {
-                                'nodes': nodes,
-                                'check': True
-                            }
-                            self.cluster_id += 1
-                        else:
-                            # recursion here
-                            message_length_group_recursion = {message_length: nodes}
-                            self.__get_clusters(message_length_group_recursion)
+                # if it is a complete graph, no clustering needed
+                graph_density = nx.density(graph)
+
+                # high density graph
+                if (self.__BOTTOM_DENSITY < graph_density <= self.__TOP_DENSITY) and \
+                        (len(graph.edges) >= self.__MAX_EDGES):
+                    force_clustering = ForceClustering(graph, self.cluster_id)
+                    clusters, self.cluster_id = force_clustering.get_clusters()
+                    self.clusters[message_length].update(clusters)
+
+                else:
+                    # clustering with valid graph only
+                    graph = self.__get_valid_graph(message_length, graph)
+                    if graph is not None:
+                        clusters = self.__get_graph_cluster(graph)
+                        for index, nodes in clusters.items():
+                            if len(nodes) <= 3:
+                                self.clusters[message_length][self.cluster_id] = {
+                                    'nodes': nodes,
+                                    'check': True
+                                }
+                                self.cluster_id += 1
+                            else:
+                                # recursion here
+                                message_length_group_recursion = {message_length: nodes}
+                                self.__get_clusters(message_length_group_recursion)
 
     def __run_preprocess(self):
         # preprocess
@@ -200,7 +215,17 @@ def lightest(g):
 
 if __name__ == '__main__':
     # parse log file
-    logfile = '/home/hudan/Git/prlogparser/datasets/casper-rw/syslog.0'
+    # get log file name
+    if len(sys.argv) == 1:
+        print('Please input dataset and file name after the command.')
+        sys.exit(1)
+    else:
+        dataset = sys.argv[1]
+        filename = sys.argv[2]
+        print('Processing dataset:', dataset, 'filename:', filename, '...')
+
+    # get log abstraction
+    logfile = '/home/hudan/Git/pylogabstract/datasets/' + dataset + '/logs/' + filename
     parser = Parser()
     parsed_results, raw_results = parser.parse_logs(logfile)
     print_true_only = True
