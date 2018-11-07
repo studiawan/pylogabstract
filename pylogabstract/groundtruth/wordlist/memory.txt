@@ -5,7 +5,8 @@ trusting ca cert from
 ovsdb-server (open vswitch)
 peak resident set size
 memory info cells
-connection dropped (c
+br0<->tcp:192.168.1.1:6633: connection dropped (c
+br0<->ssl:192.168.1.1:6633: connection dropped (c
 connection dropped (p
 routines:ssl3_read_bytes:tlsv1 alert unknown
 log messages in last

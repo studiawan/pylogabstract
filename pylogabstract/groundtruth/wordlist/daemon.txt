@@ -125,9 +125,8 @@ receive_packet failed on
 rtnetlink answers: no such process
 forcibly attempting to lazy unmount
 starting with address
-callout bind, address
+callout &AND& address
 successfully claimed ip address
-callout stop, address
 network is unreachable
 please consult readme file
 there is already a pid file
