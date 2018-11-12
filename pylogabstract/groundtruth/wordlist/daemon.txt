@@ -51,6 +51,7 @@ for info, please visit
 device eth0 state changed
 listening on &AND& enabled
 listening on &AND& disabled
+listening on lpf
 sending on
 dhcpdiscover
 dhcpoffer

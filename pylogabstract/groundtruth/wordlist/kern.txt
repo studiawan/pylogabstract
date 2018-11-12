@@ -299,6 +299,8 @@ itco_wdt: initialized
 standard hot plug pci controller
 fwh not detected
 button (ff)
+acpi: power button (
+input: power button (
 reported by plug and play acpi
 pc-style at
 pc speaker as

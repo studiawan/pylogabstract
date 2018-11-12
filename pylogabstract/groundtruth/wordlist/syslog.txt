@@ -580,6 +580,8 @@ generic explorer mouse as
 battery slot
 ac adapter 
 button (ff)
+acpi: power button (
+input: power button (
 sata link up
 sata max udma
 scsi0 : ahci
@@ -788,3 +790,4 @@ no working leases
 trash directory
 can't create gn bridge
 kernel: [    0.
+input: logitech usb trackball as

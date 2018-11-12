@@ -472,6 +472,8 @@ generic explorer mouse as
 battery slot
 ac adapter 
 button (ff)
+acpi: power button (
+input: power button (
 sata link up
 sata max udma
 scsi0 : ahci
