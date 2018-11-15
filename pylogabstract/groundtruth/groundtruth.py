@@ -1,6 +1,7 @@
 import os
 import json
 import errno
+import sys
 from configparser import ConfigParser
 from collections import defaultdict
 from pylogabstract.preprocess.preprocess import Preprocess
@@ -247,8 +248,15 @@ if __name__ == '__main__':
     datasets_config = ''
     wordlist_directory = ''
     dataset_list = ['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal',
-                    'dfrws-2016', 'honeynet-challenge5', 'honeynet-challenge7']
-    dataset_name = dataset_list[1]
+                    'dfrws-2016', 'honeynet-challenge7']
 
-    gt = GroundTruth(dataset_name, datasets_config, wordlist_directory)
-    gt.get_ground_truth()
+    if len(sys.argv) < 2:
+        print('Please input dataset name.')
+        print('experiment.py dataset_name')
+        print('Supported datasets:', dataset_list)
+        sys.exit(1)
+
+    else:
+        dataset_name = sys.argv[1]
+        gt = GroundTruth(dataset_name, datasets_config, wordlist_directory)
+        gt.get_ground_truth()
