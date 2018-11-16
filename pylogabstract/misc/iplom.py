@@ -27,6 +27,7 @@ import os
 import gc
 import re
 from collections import defaultdict
+from pylogabstract.misc.misc_utility import MiscUtility
 
 
 class Partition:
@@ -55,7 +56,7 @@ class ParaIPLoM:
     def __init__(self, path='', logname='', save_path='',
                  save_file_name='template', max_event_len=120, step2support=0, pst=0.0,
                  ct=0.175, lower_bound=0.25, upper_bound=0.9, use_pst=False,
-                 removable=True, remove_col=[], regular=True, rex=['([0-9]+\.){3}[0-9]']):
+                 removable=True, remove_col=[], regular=True, rex=['([0-9]+\.){3}[0-9]'], parsed_logs=None):
         """This is the constructor of class Para.
 
         Parameters
@@ -89,6 +90,7 @@ class ParaIPLoM:
         self.removeCol = remove_col
         self.regular = regular
         self.rex = rex
+        self.parsed_logs = parsed_logs
         # print 'max', self.maxEventLen
 
 
@@ -99,6 +101,7 @@ class IPLoM:
         self.eventsL = []
         self.output = []
         self.logs = {}
+        self.parsed_logs = {}
 
         # Initialize some partitions which contain logs with different length
         for logLen in range(self.para.maxEventLen + 1):
@@ -753,20 +756,102 @@ class IPLoM:
             }
             abstraction_id += 1
 
+        abstractions = self.__get_final_abstraction(abstractions)
         return abstractions, self.logs
+
+    @staticmethod
+    def __get_asterisk(candidate):
+        # candidate: list of list
+        abstraction = ''
+
+        # transpose row to column
+        candidate_transpose = list(zip(*candidate))
+        candidate_length = len(candidate)
+
+        if candidate_length > 1:
+            # get abstraction
+            abstraction_list = []
+            for index, message in enumerate(candidate_transpose):
+                message_length = len(set(message))
+                if message_length == 1:
+                    abstraction_list.append(message[0])
+                else:
+                    abstraction_list.append('*')
+
+            abstraction = ' '.join(abstraction_list)
+
+        elif candidate_length == 1:
+            abstraction = ' '.join(candidate[0])
+
+        return abstraction
+
+    def __get_final_abstraction(self, abstractions):
+        # restart abstraction id from 0, get abstraction and its log ids
+        # in this method, we include other fields such as timestamp, hostname, ip address, etc in abstraction
+        final_abstractions = {}
+        abstraction_id = 0
+
+        parsed_logs = self.para.parsed_logs
+        for abs_id, abstraction in abstractions.items():
+            # get entities from raw logs per cluster (except the main message)
+            candidates = defaultdict(list)
+            candidates_log_ids = defaultdict(list)
+            candidates_messages = defaultdict(list)
+            log_ids = abstraction['log_id']
+
+            for log_id in log_ids:
+                parsed = parsed_logs[log_id]
+                values = []
+                values_length = 0
+                message = []
+                for label, value in parsed.items():
+                    if label != 'message':
+                        value_split = value.split()
+                        values.extend(value_split)
+                        values_length += len(value_split)
+
+                    # get the message here
+                    else:
+                        message_split = value.split()
+                        message.extend(message_split)
+
+                # get abstraction candidates and their respective log ids
+                candidates[values_length].append(values)
+                candidates_log_ids[values_length].append(log_id)
+                candidates_messages[values_length].append(message)
+
+            # get asterisk for entity and message and then set final abstraction
+            for label_length, candidate in candidates.items():
+                entity_abstraction = self.__get_asterisk(candidate)
+                message_abstraction = self.__get_asterisk(candidates_messages[label_length])
+                final_abstractions[abstraction_id] = {
+                    'abstraction': entity_abstraction + ' ' + message_abstraction,
+                    'log_id': candidates_log_ids[label_length]
+                }
+                abstraction_id += 1
+
+        return final_abstractions
 
 if __name__ == '__main__':
     # set input path
     dataset_path = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/'
     analyzed_file = 'auth.log'
+    outputfile = '/home/hudan/Git/pylogabstract/results/' + analyzed_file
+
+    # parse logs
+    utility = MiscUtility(dataset_path + analyzed_file, outputfile)
+    parsedlogs = utility.write_parsed_message()
+
+    dataset_path = '/home/hudan/Git/pylogabstract/results/'
+    analyzed_file = 'auth.log'
     OutputPath = '/home/hudan/Git/pylogabstract/results/misc'
-    para = ParaIPLoM(path=dataset_path, logname=analyzed_file, save_path=OutputPath)
+    parameter = ParaIPLoM(path=dataset_path, logname=analyzed_file, save_path=OutputPath, parsed_logs=parsedlogs)
 
     # call IPLoM and get abstractions
-    myparser = IPLoM(para)
+    myparser = IPLoM(parameter)
     time = myparser.main_process()
-    final_abstractions, rawlogs = myparser.get_abstraction()
-    for k, v in final_abstractions.items():
+    abstractions_results, rawlogs = myparser.get_abstraction()
+    for k, v in abstractions_results.items():
         print(k, v)
 
     print('Time:', time)
