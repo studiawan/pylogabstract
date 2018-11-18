@@ -839,8 +839,8 @@ if __name__ == '__main__':
     outputfile = '/home/hudan/Git/pylogabstract/results/' + analyzed_file
 
     # parse logs
-    utility = MiscUtility(dataset_path + analyzed_file, outputfile)
-    parsedlogs = utility.write_parsed_message()
+    utility = MiscUtility()
+    parsedlogs = utility.write_parsed_message(dataset_path + analyzed_file, outputfile)
 
     dataset_path = '/home/hudan/Git/pylogabstract/results/'
     analyzed_file = 'auth.log'
