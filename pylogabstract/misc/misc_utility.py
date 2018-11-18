@@ -15,8 +15,11 @@ class MiscUtility(object):
         # this file will be read by a particular method
         parsed_logs = self.__parser(log_file)
         f = open(output_file, 'w')
-        for entity, value in parsed_logs.items():
-            f.write(value['message'] + '\n')
+        for log_id, value in parsed_logs.items():
+            if value['message'] not in ['', '\n', '\r\n']:
+                f.write(value['message'] + '\n')
+            else:
+                f.write('pylogabstract: no message found' + '\n')
         f.close()
 
         return parsed_logs
