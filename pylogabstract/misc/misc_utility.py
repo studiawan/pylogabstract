@@ -1,4 +1,5 @@
 from pylogabstract.parser.parser import Parser
+from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 
 
 class MiscUtility(object):
@@ -23,6 +24,13 @@ class MiscUtility(object):
         f.close()
 
         return parsed_logs
+
+    @staticmethod
+    def get_cluster_number(groundtruth_file):
+        abstractionid_abstractionstr = AbstractionUtility.read_json(groundtruth_file)
+        cluster_number = len(abstractionid_abstractionstr.keys())
+
+        return cluster_number
 
 
 if __name__ == '__main__':
