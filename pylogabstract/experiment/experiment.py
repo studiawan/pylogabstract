@@ -25,7 +25,7 @@ class Experiment(object):
         if self.method == 'pylogabstract':
             self.log_abstraction = LogAbstraction()
 
-        elif self.method == 'iplom':
+        elif self.method in ['iplom', 'logsig']:
             self.misc_utility = MiscUtility()
 
     @staticmethod
@@ -139,41 +139,25 @@ class Experiment(object):
 
         return abstractions, raw_logs
 
-    @staticmethod
-    def __run_logsig(log_path, groundtruth_file, abstraction_withid_path):
+    def __run_logsig(self, log_path, output_path, groundtruth_file):
         # get input
         log_path_split = log_path.split('/')
         directory = '/'.join(log_path_split[:-1]) + '/'
         filename = log_path_split[-1]
 
-        # get ground truth
-        groundtruth = AbstractionUtility.read_json(groundtruth_file)
-        groundtruth_list = list(groundtruth.values())
+        # write log file containing message only
+        parsed_logs = self.misc_utility.write_parsed_message(log_path, output_path)
 
-        # run LogSig with k = [2, 3, ... 10]
-        # choose k that provides the best accuracy
-        best_abstractions, raw_logs = {}, {}
-        best_accuracy = 0.
-        for cluster_number in range(10, 21):
-            # run LogSig
-            para = ParaLogSig(path=directory, logname=filename, groupNum=cluster_number)
-            logsig = LogSig(para)
-            logsig.mainProcess()
-            abstractions, raw_logs = logsig.get_abstractions()
+        # get number of cluster (misc_utility)
+        cluster_number = self.misc_utility.get_cluster_number(groundtruth_file)
 
-            # get accuracy
-            lineid_abstractionid_prediction = \
-                AbstractionUtility.get_abstractionid_from_groundtruth(abstraction_withid_path, abstractions)
-            prediction_list = list(lineid_abstractionid_prediction.values())
-            accuracy = accuracy_score(groundtruth_list, prediction_list)
+        # run LogSig with k from ground truth
+        para = ParaLogSig(path=directory, logname=filename, groupNum=cluster_number, parsed_logs=parsed_logs)
+        logsig = LogSig(para)
+        logsig.mainProcess()
+        abstractions, raw_logs = logsig.get_abstractions()
 
-            # get the best accuracy
-            print(accuracy)
-            if best_accuracy < accuracy:
-                best_accuracy = accuracy
-                best_abstractions = abstractions
-
-        return best_abstractions, raw_logs
+        return abstractions, raw_logs
 
     def __get_abstraction(self, filename, properties):
         # run experiment: get abstraction
@@ -183,11 +167,12 @@ class Experiment(object):
             abstractions, raw_logs = self.__run_pylogabstract(properties['log_path'])
 
         elif self.method == 'iplom':
-            abstractions, raw_logs = self.__run_iplom(properties['log_path'], properties['message_file_path'])
+            abstractions, raw_logs = self.__run_iplom(properties['log_path'],
+                                                      properties['message_file_path'])
 
         elif self.method == 'logsig':
             abstractions, raw_logs = self.__run_logsig(properties['log_path'],
-                                                       properties['lineid_abstractionid_path'],
+                                                       properties['message_file_path'],
                                                        properties['abstraction_withid_path'])
 
             # write result to file
