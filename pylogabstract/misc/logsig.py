@@ -1,4 +1,3 @@
-import numpy
 import random
 import math
 import time
@@ -6,34 +5,15 @@ import operator
 import re
 import os
 import gc
+from collections import defaultdict
+from pylogabstract.misc.misc_utility import MiscUtility
 
-
-# **********************PARAMETERS SETTING**************************************************
-# Replace the parameters of def __init__ with the following ones according to the dataset.
-# Please be noted that part of the codes in function termpairGene need to be altered according to the dataset
-# ******************************************************************************************
-# =====For BGL=====
-# (self,path='../Data/2kBGL/',logname='rawlog.log',removable=True,removeCol=[0,1,2,3,4,5,6,7,8,9],regular=True,
-# rex=['core\.[0-9]*'],savePath='./results_2kBGL/',saveFileName='template',groupNum=100):# line 66,change the regular expression replacement code
-# =====For Proxifier=====
-# (self,path='../Data/2kProxifier/',logname='rawlog.log',removable=True,removeCol=[0,1,2,4,5],regular=True,
-# rex=[''],savePath='./results_2kProxifier/',saveFileName='template',groupNum=6):
-# =====For Zookeeper=====
-# (self,path='../Data/2kZookeeper/',logname='rawlog.log',removable=True,removeCol=[0,1,2,3,4,5,6],regular=True,
-# rex=['(/|)([0-9]+\.){3}[0-9]+(:[0-9]+|)(:|)'],savePath='./results_2kZookeeper/',saveFileName='template',groupNum=46):
-# =====For HDFS=====
-# (self,path='../Data/2kHDFS/',logname='rawlog.log',removable=True,removeCol=[0,1,2,3,4,5],regular=True,
-# rex=['blk_(|-)[0-9]+','(/|)([0-9]+\.){3}[0-9]+(:[0-9]+|)(:|)'],savePath='./results_2kHDFS/',saveFileName='template',groupNum=14):
-# =====For HPC=====
-# (self,path='../Data/2kHPC/',logname='rawlog.log',removable=True,removeCol=[0,1],regular=True,
-# rex=['([0-9]+\.){3}[0-9]'],savePath='./results_2kHPC/',saveFileName='template',groupNum=51):# line 67,change the regular expression replacement code
-# ******************************************************************************************
 
 class ParaLogSig:
     def __init__(self, path='', logname='', removable=True, removeCol=[],
                  regular=True,
                  rex=[], savePath='',
-                 saveFileName='template', groupNum=14):  # line 66,change the regular expression replacement code
+                 saveFileName='template', groupNum=14, parsed_logs=None):  # line 66,change the regular expression replacement code
         self.path = path
         self.logname = logname
         self.removable = removable
@@ -43,6 +23,7 @@ class ParaLogSig:
         self.savePath = savePath
         self.saveFileName = saveFileName
         self.groupNum = groupNum  # partition into k groups
+        self.parsed_logs = parsed_logs
 
 
 class LogSig:
@@ -243,6 +224,7 @@ class LogSig:
         #         # pjhe
         #         fi.write(' '.join(signature[j]) + '\n')
 
+        abstractions = self.__get_final_abstraction(abstractions)
         return abstractions
 
     # save the grouped loglines into different templates.txt
@@ -284,6 +266,79 @@ class LogSig:
     def get_abstractions(self):
         return self.abstractions, self.logs
 
+    @staticmethod
+    def __get_asterisk(candidate):
+        # candidate: list of list
+        abstraction = ''
+
+        # transpose row to column
+        candidate_transpose = list(zip(*candidate))
+        candidate_length = len(candidate)
+
+        if candidate_length > 1:
+            # get abstraction
+            abstraction_list = []
+            for index, message in enumerate(candidate_transpose):
+                message_length = len(set(message))
+                if message_length == 1:
+                    abstraction_list.append(message[0])
+                else:
+                    abstraction_list.append('*')
+
+            abstraction = ' '.join(abstraction_list)
+
+        elif candidate_length == 1:
+            abstraction = ' '.join(candidate[0])
+
+        return abstraction
+
+    def __get_final_abstraction(self, abstractions):
+        # restart abstraction id from 0, get abstraction and its log ids
+        # in this method, we include other fields such as timestamp, hostname, ip address, etc in abstraction
+        final_abstractions = {}
+        abstraction_id = 0
+
+        parsed_logs = self.para.parsed_logs
+        for abs_id, abstraction in abstractions.items():
+            # get entities from raw logs per cluster (except the main message)
+            candidates = defaultdict(list)
+            candidates_log_ids = defaultdict(list)
+            candidates_messages = defaultdict(list)
+            log_ids = abstraction['log_id']
+
+            for log_id in log_ids:
+                parsed = parsed_logs[log_id]
+                values = []
+                values_length = 0
+                message = []
+                for label, value in parsed.items():
+                    if label != 'message':
+                        value_split = value.split()
+                        values.extend(value_split)
+                        values_length += len(value_split)
+
+                    # get the message here
+                    else:
+                        message_split = value.split()
+                        message.extend(message_split)
+
+                # get abstraction candidates and their respective log ids
+                candidates[values_length].append(values)
+                candidates_log_ids[values_length].append(log_id)
+                candidates_messages[values_length].append(message)
+
+            # get asterisk for entity and message and then set final abstraction
+            for label_length, candidate in candidates.items():
+                entity_abstraction = self.__get_asterisk(candidate)
+                message_abstraction = self.__get_asterisk(candidates_messages[label_length])
+                final_abstractions[abstraction_id] = {
+                    'abstraction': entity_abstraction + ' ' + message_abstraction,
+                    'log_id': candidates_log_ids[label_length]
+                }
+                abstraction_id += 1
+
+        return final_abstractions
+
 
 def potenFunc(curGroupIndex, termPairLogNumLD, logNumPerGroup, lineNum, termpairLT, k):
     maxDeltaD = 0
@@ -323,9 +378,18 @@ if __name__ == '__main__':
     # set input path
     dataset_path = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/'
     analyzed_file = 'auth.log'
-    para = ParaLogSig(path=dataset_path, logname=analyzed_file)     # groupNum = default
+    outputfile = '/home/hudan/Git/pylogabstract/results/' + analyzed_file
 
-    # call IPLoM and get clusters
+    # parse logs
+    utility = MiscUtility()
+    parsedlogs = utility.write_parsed_message(dataset_path + analyzed_file, outputfile)
+
+    # get cluster number
+    groundtruth_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-abstraction_withid/' + analyzed_file
+    cluster_number = utility.get_cluster_number(groundtruth_file)
+
+    # call LogSig and get clusters
+    para = ParaLogSig(path=dataset_path, logname=analyzed_file, groupNum=cluster_number, parsed_logs=parsedlogs)
     myparser = LogSig(para)
     time = myparser.mainProcess()
     abstractions_result, rawlogs = myparser.get_abstractions()
