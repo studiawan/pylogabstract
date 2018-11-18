@@ -10,6 +10,7 @@ from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
 from pylogabstract.misc.iplom import IPLoM, ParaIPLoM
 from pylogabstract.misc.logsig import LogSig, ParaLogSig
+from pylogabstract.misc.misc_utility import MiscUtility
 
 
 class Experiment(object):
@@ -21,7 +22,11 @@ class Experiment(object):
         self.files = {}
 
         # initiate abstraction
-        self.log_abstraction = LogAbstraction()
+        if self.method == 'pylogabstract':
+            self.log_abstraction = LogAbstraction()
+
+        elif self.method == 'iplom':
+            self.misc_utility = MiscUtility()
 
     @staticmethod
     def __check_path(path):
@@ -116,13 +121,18 @@ class Experiment(object):
         abstractions, raw_logs = self.log_abstraction.get_abstraction(log_path)
         return abstractions, raw_logs
 
-    @staticmethod
-    def __run_iplom(log_path):
+    def __run_iplom(self, log_path, output_path):
+        # get file and directory
         log_path_split = log_path.split('/')
-        directory = '/'.join(log_path_split[:-1]) + '/'
+        output_path_split = output_path.split('/')
+        directory = '/'.join(output_path_split[:-1]) + '/'
         filename = log_path_split[-1]
-        para = ParaIPLoM(path=directory, logname=filename)
 
+        # write log file containing message only
+        parsed_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+
+        # run IPLoM method
+        para = ParaIPLoM(path=directory, logname=filename, parsed_logs=parsed_logs)
         iplom = IPLoM(para)
         iplom.main_process()
         abstractions, raw_logs = iplom.get_abstraction()
@@ -173,7 +183,7 @@ class Experiment(object):
             abstractions, raw_logs = self.__run_pylogabstract(properties['log_path'])
 
         elif self.method == 'iplom':
-            abstractions, raw_logs = self.__run_iplom(properties['log_path'])
+            abstractions, raw_logs = self.__run_iplom(properties['log_path'], properties['message_file_path'])
 
         elif self.method == 'logsig':
             abstractions, raw_logs = self.__run_logsig(properties['log_path'],
