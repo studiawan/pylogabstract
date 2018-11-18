@@ -63,6 +63,7 @@ class Parser(object):
         # parse log files using pretrained model
         raw_logs = {}
         parsed_logs = OrderedDict()
+        parsed_log_index = 0
         with open(log_file) as f:
             for line_index, line in enumerate(f):
                 if line not in ['\n', '\r\n']:
@@ -71,7 +72,8 @@ class Parser(object):
 
                     ner_label = self.model.predict(words_raw)
                     parsed = self.__get_per_entity(words_raw, ner_label)
-                    parsed_logs[line_index] = parsed
+                    parsed_logs[parsed_log_index] = parsed
+                    parsed_log_index += 1
 
         return parsed_logs, raw_logs
 
