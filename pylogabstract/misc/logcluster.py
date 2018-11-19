@@ -4,10 +4,11 @@ import hashlib
 import textwrap
 import copy
 from collections import defaultdict
+from pylogabstract.misc.misc_utility import MiscUtility
 
 
 class LogCluster(object):
-    def __init__(self, support, rsupport, log_file, rsupports=None, outlier_file='', output_file=''):
+    def __init__(self, support, rsupport, log_file, rsupports=None, outlier_file='', output_file='', parsed_logs=None):
         self.support = support
         self.rsupport = rsupport
         self.rsupports = rsupports
@@ -24,6 +25,8 @@ class LogCluster(object):
         self.clusters = {}
         self.outliers = []
         self.line_length = 0
+        self.parsed_logs = parsed_logs
+        self.raw_logs = {}
 
     # This function logs the message given with parameter2,++,parameterN to
     # syslog, using the level parameter1+ The message is also written to stderr+
@@ -119,6 +122,7 @@ class LogCluster(object):
             for line in f:
                 if not line:
                     continue
+                self.raw_logs[i] = line
                 i += 1
 
                 words_split = line.split()
@@ -406,10 +410,117 @@ class LogCluster(object):
 
         return clusters_list
 
+    def get_abstractions(self):
+        # get clusters
+        self.get_clusters()
+
+        # get abstractions
+        abstractions = {}
+        abstraction_id = 0
+        for cluster_id, log_ids in self.clusters.items():
+            candidate = []
+            for log_id in log_ids:
+                candidate.append(self.raw_logs[log_id].split())
+
+            abstractions[abstraction_id] = {
+                'abstraction': self.__get_asterisk(candidate),
+                'log_id': log_ids
+            }
+            abstraction_id += 1
+
+        abstractions = self.__get_final_abstraction(abstractions)
+        return abstractions, self.raw_logs
+
+    @staticmethod
+    def __get_asterisk(candidate):
+        # candidate: list of list
+        abstraction = ''
+
+        # transpose row to column
+        candidate_transpose = list(zip(*candidate))
+        candidate_length = len(candidate)
+
+        if candidate_length > 1:
+            # get abstraction
+            abstraction_list = []
+            for index, message in enumerate(candidate_transpose):
+                message_length = len(set(message))
+                if message_length == 1:
+                    abstraction_list.append(message[0])
+                else:
+                    abstraction_list.append('*')
+
+            abstraction = ' '.join(abstraction_list)
+
+        elif candidate_length == 1:
+            abstraction = ' '.join(candidate[0])
+
+        return abstraction
+
+    def __get_final_abstraction(self, abstractions):
+        # restart abstraction id from 0, get abstraction and its log ids
+        # in this method, we include other fields such as timestamp, hostname, ip address, etc in abstraction
+        final_abstractions = {}
+        abstraction_id = 0
+
+        parsed_logs = self.parsed_logs
+        for abs_id, abstraction in abstractions.items():
+            # get entities from raw logs per cluster (except the main message)
+            candidates = defaultdict(list)
+            candidates_log_ids = defaultdict(list)
+            candidates_messages = defaultdict(list)
+            log_ids = abstraction['log_id']
+
+            for log_id in log_ids:
+                parsed = parsed_logs[log_id]
+                values = []
+                values_length = 0
+                message = []
+                for label, value in parsed.items():
+                    if label != 'message':
+                        value_split = value.split()
+                        values.extend(value_split)
+                        values_length += len(value_split)
+
+                    # get the message here
+                    else:
+                        message_split = value.split()
+                        message.extend(message_split)
+
+                # get abstraction candidates and their respective log ids
+                candidates[values_length].append(values)
+                candidates_log_ids[values_length].append(log_id)
+                candidates_messages[values_length].append(message)
+
+            # get asterisk for entity and message and then set final abstraction
+            for label_length, candidate in candidates.items():
+                entity_abstraction = self.__get_asterisk(candidate)
+                message_abstraction = self.__get_asterisk(candidates_messages[label_length])
+                final_abstractions[abstraction_id] = {
+                    'abstraction': entity_abstraction + ' ' + message_abstraction,
+                    'log_id': candidates_log_ids[label_length]
+                }
+                abstraction_id += 1
+
+        return final_abstractions
+
 
 if __name__ == '__main__':
+    # set input path
     filename = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/auth.log'
-    supports_list = [10, 20]
-    lc = LogCluster(None, 0, filename, supports_list)
-    cl = lc.get_clusters_manysupports()
-    print(cl)
+    outputfile = '/home/hudan/Git/pylogabstract/results/auth.log'
+
+    # supports_list = [10]    # in percent
+    # lc = LogCluster(None, 0, filename, supports_list)
+    # cl = lc.get_clusters_manysupports()
+    # print(cl)
+
+    # parse logs
+    utility = MiscUtility()
+    parsedlogs = utility.write_parsed_message(filename, outputfile)
+
+    # run LogCluster method
+    lc = LogCluster(support=None, rsupport=10, log_file=filename, parsed_logs=parsedlogs)
+    abstraction_results, rawlogs = lc.get_abstractions()
+    for k, v in abstraction_results.items():
+        print(k, v)
