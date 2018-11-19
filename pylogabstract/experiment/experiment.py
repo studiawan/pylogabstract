@@ -10,6 +10,7 @@ from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
 from pylogabstract.misc.iplom import IPLoM, ParaIPLoM
 from pylogabstract.misc.logsig import LogSig, ParaLogSig
+from pylogabstract.misc.logcluster import LogCluster
 from pylogabstract.misc.misc_utility import MiscUtility
 
 
@@ -25,7 +26,7 @@ class Experiment(object):
         if self.method == 'pylogabstract':
             self.log_abstraction = LogAbstraction()
 
-        elif self.method in ['iplom', 'logsig']:
+        elif self.method in ['iplom', 'logsig', 'logcluster']:
             self.misc_utility = MiscUtility()
 
     @staticmethod
@@ -159,6 +160,35 @@ class Experiment(object):
 
         return abstractions, raw_logs
 
+    def __run_logcluster(self, log_path, output_path, groundtruth_file, abstraction_withid_path):
+        # get ground truth
+        groundtruth = AbstractionUtility.read_json(groundtruth_file)
+        groundtruth_list = list(groundtruth.values())
+
+        # write log file containing message only
+        parsed_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+
+        # run LogCluster with support = [10, 20, ... 90] in percent
+        # choose support that provides the best accuracy
+        best_abstractions, raw_logs = {}, {}
+        best_accuracy = 0.
+        for rsupport in range(10, 100, 10):
+            # run LogCluster method
+            lc = LogCluster(support=None, rsupport=rsupport, log_file=log_path, parsed_logs=parsed_logs)
+            abstractions, rawlogs = lc.get_abstractions()
+
+            # get accuracy
+            lineid_abstractionid_prediction = \
+                AbstractionUtility.get_abstractionid_from_groundtruth(abstraction_withid_path, abstractions)
+            prediction_list = list(lineid_abstractionid_prediction.values())
+            accuracy = accuracy_score(groundtruth_list, prediction_list)
+
+            if best_accuracy < accuracy:
+                best_accuracy = accuracy
+                best_abstractions = abstractions
+
+        return best_abstractions, raw_logs
+
     def __get_abstraction(self, filename, properties):
         # run experiment: get abstraction
         abstractions = {}
@@ -175,7 +205,13 @@ class Experiment(object):
                                                        properties['message_file_path'],
                                                        properties['abstraction_withid_path'])
 
-            # write result to file
+        elif self.method == 'logcluster':
+            abstractions, raw_logs = self.__run_logcluster(properties['log_path'],
+                                                           properties['message_file_path'],
+                                                           properties['lineid_abstractionid_path'],
+                                                           properties['abstraction_withid_path'])
+
+        # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
         Output.write_perabstraction(abstractions, raw_logs, properties['perabstraction_path'])
         Output.write_comparison(properties['abstraction_withid_path'], properties['lineid_abstractionid_path'],
