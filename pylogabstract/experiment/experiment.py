@@ -11,6 +11,7 @@ from pylogabstract.output.output import Output
 from pylogabstract.misc.iplom import IPLoM, ParaIPLoM
 from pylogabstract.misc.logsig import LogSig, ParaLogSig
 from pylogabstract.misc.logcluster import LogCluster
+from pylogabstract.misc.drainv1 import Drain, ParaDrain
 from pylogabstract.misc.misc_utility import MiscUtility
 
 
@@ -26,7 +27,7 @@ class Experiment(object):
         if self.method == 'pylogabstract':
             self.log_abstraction = LogAbstraction()
 
-        elif self.method in ['iplom', 'logsig', 'logcluster']:
+        elif self.method in ['iplom', 'logsig', 'logcluster', 'drain']:
             self.misc_utility = MiscUtility()
 
     @staticmethod
@@ -189,6 +190,18 @@ class Experiment(object):
 
         return best_abstractions, raw_logs
 
+    def __run_drain(self, log_path, output_path):
+        # write log file containing message only
+        parsed_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+
+        # run Drain method
+        para = ParaDrain(path=log_path, st=0.5, depth=4, parsed_logs=parsed_logs)
+        drain = Drain(para)
+        drain.mainProcess()
+        abstractions, raw_logs = drain.get_abstractions()
+
+        return abstractions, raw_logs
+
     def __get_abstraction(self, filename, properties):
         # run experiment: get abstraction
         abstractions = {}
@@ -210,6 +223,10 @@ class Experiment(object):
                                                            properties['message_file_path'],
                                                            properties['lineid_abstractionid_path'],
                                                            properties['abstraction_withid_path'])
+
+        elif self.method == 'drain':
+            abstractions, raw_logs = self.__run_drain(properties['log_path'],
+                                                      properties['message_file_path'])
 
         # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
