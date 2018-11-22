@@ -42,8 +42,8 @@ saveTempFileName: the output template file name
 
 
 class ParaDrain:
-    def __init__(self, rex=None, path='./', depth=4, st=0.4, maxChild=100, logName='', removable=True,
-                 removeCol=[], savePath='./results/', saveFileName='template', saveTempFileName='logTemplates.txt',
+    def __init__(self, rex=None, path='', depth=4, st=0.4, maxChild=100, logName='', removable=True,
+                 removeCol=[], savePath='', saveFileName='template', saveTempFileName='logTemplates.txt',
                  parsed_logs=None):
         self.path = path
         self.depth = depth - 2
@@ -392,22 +392,24 @@ class Drain:
 
 if __name__ == '__main__':
     # set input path
-    path = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/auth.log'
-    outputfile = '/home/hudan/Git/pylogabstract/results/auth.log'
+    path = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/'
+    analyzed_file = 'auth.log'
+    outputfile = '/home/hudan/Git/pylogabstract/results/' + analyzed_file
 
     # parse logs
     utility = MiscUtility()
-    parsedlogs = utility.write_parsed_message(path, outputfile)
+    parsedlogs, _ = utility.write_parsed_message(path + analyzed_file, outputfile)
 
     # run Drain method
-    removeCol = []  # [0,1,2,3,4] for HDFS
+    msg_path = '/home/hudan/Git/pylogabstract/results/'
+    removeCol = []
     st = 0.5
     depth = 4
-    # rex = ['blk_(|-)[0-9]+', '(/|)([0-9]+\.){3}[0-9]+(:[0-9]+|)(:|)']
-    parserPara = ParaDrain(path=path, st=st, removeCol=removeCol, depth=depth, parsed_logs=parsedlogs)
+    parserPara = ParaDrain(path=msg_path, st=st, logName=analyzed_file, removeCol=removeCol, depth=depth,
+                           parsed_logs=parsedlogs)
     myParser = Drain(parserPara)
     myParser.mainProcess()
-    abstraction_results = myParser.abstractions
+    abstraction_results, rawlogs = myParser.get_abstractions()
 
     for k, v in abstraction_results.items():
         print(k, v)
