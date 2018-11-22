@@ -11,6 +11,8 @@ from pylogabstract.output.output import Output
 from pylogabstract.misc.iplom import IPLoM, ParaIPLoM
 from pylogabstract.misc.logsig import LogSig, ParaLogSig
 from pylogabstract.misc.drainv1 import Drain, ParaDrain
+from pylogabstract.misc.logmine import LogMine
+from pylogabstract.misc.spell_interface import SpellInterface
 from pylogabstract.misc.misc_utility import MiscUtility
 
 
@@ -143,7 +145,8 @@ class Experiment(object):
     def __run_logsig(self, log_path, output_path, groundtruth_file):
         # get input
         log_path_split = log_path.split('/')
-        directory = '/'.join(output_path[:-1]) + '/'
+        output_path_split = output_path.split('/')
+        directory = '/'.join(output_path_split[:-1]) + '/'
         filename = log_path_split[-1]
 
         # write log file containing message only
@@ -163,7 +166,8 @@ class Experiment(object):
     def __run_drain(self, log_path, output_path):
         # get input
         log_path_split = log_path.split('/')
-        directory = '/'.join(output_path[:-1]) + '/'
+        output_path_split = output_path.split('/')
+        directory = '/'.join(output_path_split[:-1]) + '/'
         filename = log_path_split[-1]
 
         # write log file containing message only
@@ -174,6 +178,41 @@ class Experiment(object):
         drain = Drain(para)
         drain.mainProcess()
         abstractions, raw_logs = drain.get_abstractions()
+
+        return abstractions, raw_logs
+
+    def __run_logmine(self, log_path, output_path):
+        # get input
+        log_path_split = log_path.split('/')
+        output_path_split = output_path.split('/')
+        directory = '/'.join(output_path_split[:-1]) + '/'
+        filename = log_path_split[-1]
+        output_dir = ''
+        log_format = '<Content>'
+
+        # write log file containing message only
+        parsed_logs, raw_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+
+        # run LogMine method
+        logmine = LogMine(directory, output_dir, log_format, parsed_logs=parsed_logs)
+        logmine.parse(filename)
+        abstractions = logmine.get_abstractions()
+
+        return abstractions, raw_logs
+
+    def __run_spell(self, log_path, output_path, abstraction_json_file):
+        # get input
+        log_path_split = log_path.split('/')
+        output_path_split = output_path.split('/')
+        directory = '/'.join(output_path_split[:-1]) + '/'
+        filename = log_path_split[-1]
+
+        # write log file containing message only
+        parsed_logs, raw_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+
+        # run Spell method
+        spell = SpellInterface(parsed_logs, directory, filename, abstraction_json_file)
+        abstractions = spell.get_abstractions()
 
         return abstractions, raw_logs
 
@@ -197,7 +236,16 @@ class Experiment(object):
             abstractions, raw_logs = self.__run_drain(properties['log_path'],
                                                       properties['message_file_path'])
 
-        # write result to file
+        elif self.method == 'logmine':
+            abstractions, raw_logs = self.__run_logmine(properties['log_path'],
+                                                        properties['message_file_path'])
+
+        elif self.method == 'spell':
+            abstractions, raw_logs = self.__run_spell(properties['log_path'],
+                                                      properties['message_file_path'],
+                                                      properties['abstraction_json'])
+
+            # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
         Output.write_perabstraction(abstractions, raw_logs, properties['perabstraction_path'])
         Output.write_comparison(properties['abstraction_withid_path'], properties['lineid_abstractionid_path'],
