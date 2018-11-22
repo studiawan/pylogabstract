@@ -382,14 +382,15 @@ if __name__ == '__main__':
 
     # parse logs
     utility = MiscUtility()
-    parsedlogs = utility.write_parsed_message(dataset_path + analyzed_file, outputfile)
+    parsedlogs, _ = utility.write_parsed_message(dataset_path + analyzed_file, outputfile)
 
     # get cluster number
     groundtruth_file = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs-abstraction_withid/' + analyzed_file
     cluster_number = utility.get_cluster_number(groundtruth_file)
 
     # call LogSig and get clusters
-    para = ParaLogSig(path=dataset_path, logname=analyzed_file, groupNum=cluster_number, parsed_logs=parsedlogs)
+    msg_path = '/home/hudan/Git/pylogabstract/results/'
+    para = ParaLogSig(path=msg_path, logname=analyzed_file, groupNum=cluster_number, parsed_logs=parsedlogs)
     myparser = LogSig(para)
     time = myparser.mainProcess()
     abstractions_result, rawlogs = myparser.get_abstractions()

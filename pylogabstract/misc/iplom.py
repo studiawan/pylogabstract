@@ -834,17 +834,17 @@ class IPLoM:
 
 if __name__ == '__main__':
     # set input path
-    dataset_path = '/home/hudan/Git/pylogabstract/datasets/dfrws-2009-nssal/logs/'
-    analyzed_file = 'dmesg'
+    dataset_path = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/'
+    analyzed_file = 'auth.log'
     outputfile = '/home/hudan/Git/pylogabstract/results/' + analyzed_file
 
     # parse logs
     utility = MiscUtility()
-    parsedlogs = utility.write_parsed_message(dataset_path + analyzed_file, outputfile)
+    parsedlogs, _ = utility.write_parsed_message(dataset_path + analyzed_file, outputfile)
 
-    dataset_path = '/home/hudan/Git/pylogabstract/results/'
+    msg_path = '/home/hudan/Git/pylogabstract/results/'
     OutputPath = '/home/hudan/Git/pylogabstract/results/misc/'
-    parameter = ParaIPLoM(path=dataset_path, logname=analyzed_file, save_path=OutputPath, parsed_logs=parsedlogs)
+    parameter = ParaIPLoM(path=msg_path, logname=analyzed_file, save_path=OutputPath, parsed_logs=parsedlogs)
 
     # call IPLoM and get abstractions
     myparser = IPLoM(parameter)

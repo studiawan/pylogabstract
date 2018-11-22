@@ -44,7 +44,7 @@ class LogMine():
         self.parsed_logs = parsed_logs
 
     def parse(self, logname):
-        print('Parsing file: ' + os.path.join(self.path, logname))
+        # print('Parsing file: ' + os.path.join(self.path, logname))
         self.logname = logname
         starttime = datetime.now()
         self.load_data()
@@ -63,7 +63,7 @@ class LogMine():
                     cluster.patterns = [self.sequential_merge(cluster.patterns)]
                 self.level_clusters[lev] = clusters
         self.dump()
-        print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - starttime))
+        # print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - starttime))
 
     def dump(self):
         # if not os.path.isdir(self.savePath):
@@ -201,7 +201,6 @@ class LogMine():
                     log_messages.append(message)
 
                     self.raw_logs[linecount] = line
-                    print(line)
                     linecount += 1
                 except Exception as e:
                     pass
@@ -297,8 +296,6 @@ class LogMine():
             for label_length, candidate in candidates.items():
                 entity_abstraction = self.__get_asterisk(candidate)
                 message_abstraction = self.__get_asterisk(candidates_messages[label_length])
-                print('entity', entity_abstraction)
-                print('msg', message_abstraction)
                 final_abstractions[abstraction_id] = {
                     'abstraction': entity_abstraction + ' ' + message_abstraction,
                     'log_id': candidates_log_ids[label_length]
@@ -310,8 +307,7 @@ class LogMine():
 
 if __name__ == '__main__':
     input_dir = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/'     # The input directory of log file
-    # input_dir = '/home/hudan/Git/pylogabstract/results/drain/casper-rw/message'
-    output_dir = '/home/hudan/Git/pylogabstract/results/misc/'  # The output directory of parsing results
+    output_dir = ''  # The output directory of parsing results
     log_file = 'auth.log'   # The input log file name
     log_format = '<Content>'  # HDFS log format
     levels = 2  # The levels of hierarchy of patterns
@@ -329,4 +325,7 @@ if __name__ == '__main__':
     parser = LogMine(msg_dir, output_dir, log_format, rex=regex, levels=levels, max_dist=max_dist, k=k,
                      parsed_logs=parsedlogs)
     parser.parse(log_file)
-    parser.get_abstractions()
+    abstraction_results, rawlogs = parser.get_abstractions()
+
+    for k, v in abstraction_results.items():
+        print(k, v)

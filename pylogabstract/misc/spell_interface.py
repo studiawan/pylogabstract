@@ -1,6 +1,7 @@
 import subprocess
 from collections import defaultdict
 from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
+from pylogabstract.misc.misc_utility import MiscUtility
 
 
 class SpellInterface(object):
@@ -93,3 +94,22 @@ class SpellInterface(object):
                 abstraction_id += 1
 
         return final_abstractions
+
+
+if __name__ == '__main__':
+    # set input path
+    dataset_path = '/home/hudan/Git/pylogabstract/datasets/casper-rw/logs/'
+    analyzed_file = 'auth.log'
+    outputfile = '/home/hudan/Git/pylogabstract/results/' + analyzed_file
+    abstraction_jsonfile = outputfile + '.json'
+
+    # parse logs
+    utility = MiscUtility()
+    parsedlogs, _ = utility.write_parsed_message(dataset_path + analyzed_file, outputfile)
+
+    msg_dir = '/home/hudan/Git/pylogabstract/results/'
+    spell = SpellInterface(parsedlogs, msg_dir, analyzed_file, abstraction_jsonfile)
+    abstraction_results = spell.get_abstractions()
+
+    for k, v in abstraction_results.items():
+        print(k, v)
