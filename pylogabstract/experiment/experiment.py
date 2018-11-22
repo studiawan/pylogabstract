@@ -10,7 +10,6 @@ from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
 from pylogabstract.misc.iplom import IPLoM, ParaIPLoM
 from pylogabstract.misc.logsig import LogSig, ParaLogSig
-from pylogabstract.misc.logcluster import LogCluster
 from pylogabstract.misc.drainv1 import Drain, ParaDrain
 from pylogabstract.misc.misc_utility import MiscUtility
 
@@ -27,7 +26,7 @@ class Experiment(object):
         if self.method == 'pylogabstract':
             self.log_abstraction = LogAbstraction()
 
-        elif self.method in ['iplom', 'logsig', 'logcluster', 'drain']:
+        elif self.method in ['iplom', 'logsig', 'drain', 'logmine', 'spell']:
             self.misc_utility = MiscUtility()
 
     @staticmethod
@@ -131,7 +130,7 @@ class Experiment(object):
         filename = log_path_split[-1]
 
         # write log file containing message only
-        parsed_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+        parsed_logs, _ = self.misc_utility.write_parsed_message(log_path, output_path)
 
         # run IPLoM method
         para = ParaIPLoM(path=directory, logname=filename, parsed_logs=parsed_logs)
@@ -144,11 +143,11 @@ class Experiment(object):
     def __run_logsig(self, log_path, output_path, groundtruth_file):
         # get input
         log_path_split = log_path.split('/')
-        directory = '/'.join(log_path_split[:-1]) + '/'
+        directory = '/'.join(output_path[:-1]) + '/'
         filename = log_path_split[-1]
 
         # write log file containing message only
-        parsed_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+        parsed_logs, _ = self.misc_utility.write_parsed_message(log_path, output_path)
 
         # get number of cluster (misc_utility)
         cluster_number = self.misc_utility.get_cluster_number(groundtruth_file)
@@ -161,41 +160,17 @@ class Experiment(object):
 
         return abstractions, raw_logs
 
-    def __run_logcluster(self, log_path, output_path, groundtruth_file, abstraction_withid_path):
-        # get ground truth
-        groundtruth = AbstractionUtility.read_json(groundtruth_file)
-        groundtruth_list = list(groundtruth.values())
-
-        # write log file containing message only
-        parsed_logs = self.misc_utility.write_parsed_message(log_path, output_path)
-
-        # run LogCluster with support = [10, 20, ... 90] in percent
-        # choose support that provides the best accuracy
-        best_abstractions, raw_logs = {}, {}
-        best_accuracy = 0.
-        for rsupport in range(10, 100, 10):
-            # run LogCluster method
-            lc = LogCluster(support=None, rsupport=rsupport, log_file=log_path, parsed_logs=parsed_logs)
-            abstractions, rawlogs = lc.get_abstractions()
-
-            # get accuracy
-            lineid_abstractionid_prediction = \
-                AbstractionUtility.get_abstractionid_from_groundtruth(abstraction_withid_path, abstractions)
-            prediction_list = list(lineid_abstractionid_prediction.values())
-            accuracy = accuracy_score(groundtruth_list, prediction_list)
-
-            if best_accuracy < accuracy:
-                best_accuracy = accuracy
-                best_abstractions = abstractions
-
-        return best_abstractions, raw_logs
-
     def __run_drain(self, log_path, output_path):
+        # get input
+        log_path_split = log_path.split('/')
+        directory = '/'.join(output_path[:-1]) + '/'
+        filename = log_path_split[-1]
+
         # write log file containing message only
-        parsed_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+        parsed_logs, _ = self.misc_utility.write_parsed_message(log_path, output_path)
 
         # run Drain method
-        para = ParaDrain(path=log_path, st=0.5, depth=4, parsed_logs=parsed_logs)
+        para = ParaDrain(path=directory, logName=filename, st=0.5, depth=4, parsed_logs=parsed_logs)
         drain = Drain(para)
         drain.mainProcess()
         abstractions, raw_logs = drain.get_abstractions()
@@ -217,12 +192,6 @@ class Experiment(object):
             abstractions, raw_logs = self.__run_logsig(properties['log_path'],
                                                        properties['message_file_path'],
                                                        properties['abstraction_withid_path'])
-
-        elif self.method == 'logcluster':
-            abstractions, raw_logs = self.__run_logcluster(properties['log_path'],
-                                                           properties['message_file_path'],
-                                                           properties['lineid_abstractionid_path'],
-                                                           properties['abstraction_withid_path'])
 
         elif self.method == 'drain':
             abstractions, raw_logs = self.__run_drain(properties['log_path'],
