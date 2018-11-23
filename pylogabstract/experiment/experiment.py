@@ -4,7 +4,6 @@ import csv
 import sys
 import statistics
 from configparser import ConfigParser
-from sklearn.metrics import accuracy_score  # precision_score, recall_score, f1_score,
 from pylogabstract.abstraction.abstraction import LogAbstraction
 from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
 from pylogabstract.output.output import Output
@@ -14,6 +13,7 @@ from pylogabstract.misc.drainv1 import Drain, ParaDrain
 from pylogabstract.misc.logmine import LogMine
 from pylogabstract.misc.spell_interface import SpellInterface
 from pylogabstract.misc.misc_utility import MiscUtility
+from pylogabstract.evaluation.evaluation import Evaluation
 
 
 class Experiment(object):
@@ -101,22 +101,15 @@ class Experiment(object):
                                                      self.configuration['experiments']['evaluation_file'])
 
     @staticmethod
-    def __get_evaluation_metrics(groundtruth_file, prediction):
-        # groundtruth and prediction has the same format= line_id: abstraction_id
+    def __get_evaluation_metrics(groundtruth_file, lineid_abstractionid_prediction):
         groundtruth = AbstractionUtility.read_json(groundtruth_file)
-        groundtruth_list = list(groundtruth.values())
-        prediction_list = list(prediction.values())
+        abstractionid_logids_groundtruth = AbstractionUtility.get_groundtruth_abstractionid_logids(groundtruth)
+        abstractionid_logids_prediction = \
+            AbstractionUtility.get_groundtruth_abstractionid_logids(lineid_abstractionid_prediction)
 
-        # precision = precision_score(groundtruth_list, prediction_list, average='micro')
-        # recall = recall_score(groundtruth_list, prediction_list, average='micro')
-        # f1 = f1_score(groundtruth_list, prediction_list, average='micro')
-        precision, recall, f1 = 0, 0, 0
-        accuracy = accuracy_score(groundtruth_list, prediction_list)
-
-        metrics = {'precision': round(precision, 3),
-                   'recall': round(recall, 3),
-                   'f1': round(f1, 3),
-                   'accuracy': round(accuracy, 3)}
+        evaluation = Evaluation(abstractionid_logids_groundtruth, abstractionid_logids_prediction,
+                                lineid_abstractionid_prediction)
+        metrics = evaluation.get_metrics()
 
         return metrics
 
@@ -245,7 +238,7 @@ class Experiment(object):
                                                       properties['message_file_path'],
                                                       properties['abstraction_json'])
 
-            # write result to file
+        # write result to file
         Output.write_perline(abstractions, raw_logs, properties['perline_path'])
         Output.write_perabstraction(abstractions, raw_logs, properties['perabstraction_path'])
         Output.write_comparison(properties['abstraction_withid_path'], properties['lineid_abstractionid_path'],
@@ -258,8 +251,11 @@ class Experiment(object):
         # get evaluation metrics
         metrics = self.__get_evaluation_metrics(properties['lineid_abstractionid_path'],
                                                 lineid_abstractionid_prediction)
-        evaluation_metrics = (filename, metrics['precision'], metrics['recall'], metrics['f1'], metrics['accuracy'])
-        print('Accuracy :', metrics['accuracy'], '\n')
+        evaluation_metrics = (filename, metrics['tp'], metrics['fp'], metrics['fn'],
+                              metrics['precision'], metrics['recall'], metrics['accuracy'])
+        print('tp:', metrics['tp'], 'fp:', metrics['fp'], 'fn:', metrics['fn'],
+              'precision:', metrics['precision'], 'recall:', metrics['recall'])
+        print('accuracy:', metrics['accuracy'], '\n')
 
         return evaluation_metrics
 
@@ -283,9 +279,11 @@ class Experiment(object):
                 print('Processing', filename, '...')
                 metrics = self.__get_abstraction(filename, properties)
                 writer.writerow(metrics)
-                accuracy.append(metrics[4])
+                accuracy.append(metrics[6])
 
-        print('Mean accuracy:', statistics.mean(accuracy))
+        mean_accuracy = statistics.mean(accuracy)
+        writer.writerow(('-', '-', '-', '-', '-', '-', mean_accuracy))
+        print('Mean accuracy:', mean_accuracy)
 
         # close evaluation file
         f.close()
