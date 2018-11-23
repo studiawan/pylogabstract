@@ -1,11 +1,12 @@
 import sys
 from itertools import combinations
 from collections import defaultdict, OrderedDict
-# from pylogabstract.clustering.clustering import LogClustering
 from pylogabstract.clustering.recursion_clustering import LogClustering
 from pylogabstract.preprocess.hamming_similarity import HammingSimilarity
 from pylogabstract.parser.parser import Parser
 from pylogabstract.output.output import Output
+from pylogabstract.abstraction.abstraction_utility import AbstractionUtility
+from pylogabstract.evaluation.evaluation import Evaluation
 
 
 class LogAbstraction(object):
@@ -382,6 +383,19 @@ class LogAbstraction(object):
         # final_abstractions[abstraction_id] = {'abstraction': str, 'log_id': [int, ...]}
         return final_abstractions, raw_logs
 
+
+def get_evaluation_metrics(groundtruth_file, lineid_abstractionid_prediction):
+    groundtruth = AbstractionUtility.read_json(groundtruth_file)
+    abstractionid_logids_groundtruth = AbstractionUtility.get_groundtruth_abstractionid_logids(groundtruth)
+    abstractionid_logids_prediction = \
+        AbstractionUtility.get_groundtruth_abstractionid_logids(lineid_abstractionid_prediction)
+
+    evaluation = Evaluation(abstractionid_logids_groundtruth, abstractionid_logids_prediction,
+                            lineid_abstractionid_prediction)
+    accuracy = evaluation.get_metrics()
+
+    return accuracy
+
 if __name__ == '__main__':
     # get log file name
     if len(sys.argv) == 1:
@@ -408,3 +422,12 @@ if __name__ == '__main__':
     Output.write_perline(abstraction_results, rawlogs, 'results-perline.txt')
     Output.write_comparison(abstraction_withid_file, abstractions_groundtruth_file, abstraction_results,
                             rawlogs, 'results-comparison.txt')
+
+    # update abstraction id based on ground truth and convert the format to line_id: abstraction_id
+    lineid_abstractionid_predictions = \
+        AbstractionUtility.get_abstractionid_from_groundtruth(abstraction_withid_file, abstraction_results)
+
+    # get evaluation metrics
+    acc = get_evaluation_metrics(abstractions_groundtruth_file, lineid_abstractionid_predictions)
+    evaluation_metrics = (filename, acc)
+    print('Accuracy :', acc, '\n')
