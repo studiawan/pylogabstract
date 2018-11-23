@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 
 
 class AbstractionUtility(object):
@@ -39,3 +40,11 @@ class AbstractionUtility(object):
                 lineid_abstractionid[lineid] = new_id
 
         return lineid_abstractionid
+
+    @staticmethod
+    def get_groundtruth_abstractionid_logids(groundtruth):
+        abstractionid_logids = defaultdict(list)
+        for log_id, abstraction_id in groundtruth.items():
+            abstractionid_logids[abstraction_id].append(log_id)
+
+        return abstractionid_logids
