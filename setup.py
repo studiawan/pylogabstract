@@ -23,8 +23,7 @@ setup(name='pylogabstract',
       install_requires=[
           'tensorflow==1.4.1',
           'networkx',
-          'python-louvain',
-          'scikit-learn'
+          'python-louvain'
       ],
       include_package_data=True,
       zip_safe=False)
