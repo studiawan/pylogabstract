@@ -67,7 +67,7 @@ class Parser(object):
         with open(log_file) as f:
             for line_index, line in enumerate(f):
                 if line not in ['\n', '\r\n']:
-                    raw_logs[line_index] = line
+                    raw_logs[parsed_log_index] = line
                     words_raw = line.strip().split()
 
                     ner_label = self.model.predict(words_raw)
