@@ -184,12 +184,12 @@ class Experiment(object):
         log_format = '<Content>'
 
         # write log file containing message only
-        parsed_logs, raw_logs = self.misc_utility.write_parsed_message(log_path, output_path)
+        parsed_logs, _ = self.misc_utility.write_parsed_message(log_path, output_path)
 
         # run LogMine method
         logmine = LogMine(directory, output_dir, log_format, parsed_logs=parsed_logs)
         logmine.parse(filename)
-        abstractions = logmine.get_abstractions()
+        abstractions, raw_logs = logmine.get_abstractions()
 
         return abstractions, raw_logs
 
