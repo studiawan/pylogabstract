@@ -17,7 +17,7 @@ setup(name='pylogabstract',
       packages=['pylogabstract'],
       entry_points={
           'console_scripts': [
-              'pylogabstract = pylogabstract.pylogabstract:main'
+              'pylogabstract = pylogabstract.pylogabstraction:main'
           ],
       },
       install_requires=[
