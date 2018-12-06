@@ -76,3 +76,9 @@ class Output(object):
                 f_comparison.write(str(line_id) + ' ' + raw_logs[line_id])
 
         f_comparison.close()
+
+    @staticmethod
+    def write_abstraction_only(abstractions, output_file):
+        f_output = open(output_file, 'w')
+        for abstraction_id, abstraction in abstractions.items():
+            f_output.write('#' + str(abstraction_id) + ' ' + abstraction['abstraction'] + '\n')
