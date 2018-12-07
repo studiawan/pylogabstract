@@ -1,5 +1,14 @@
 # pylogabstract
-This is accompanying code for a paper entitled "Automatic event log abstraction to support forensic investigation" submitted to DSN conference 2019. We name the proposed method as `pylogabstract`. To run the `pylogabstract` tool, please follow these steps. 
+This is accompanying code for a paper entitled "Automatic event log abstraction to support forensic investigation" submitted to DSN conference 2019. We name the proposed method as `pylogabstract`.  
+
+## Requirements
+1. Python 3.5
+2. TensorFlow 1.4.1
+3. NetworkX 2.1
+4. python-louvain 0.11
+
+## How to run
+To run the `pylogabstract` tool, please follow these steps.
 
 1. Clone the repository
 
@@ -9,7 +18,7 @@ This is accompanying code for a paper entitled "Automatic event log abstraction 
 
    `cd pylogabstract`
 
-3. Make sure you have a `pipenv` installed and the run its shell
+3. Make sure you have a `pipenv` installed and then run its shell
 
     `pipenv shell`
 
@@ -19,8 +28,8 @@ This is accompanying code for a paper entitled "Automatic event log abstraction 
 
 5. Run `pylogabstract` to get abstractions from a log file such as `auth.log`
 
-   `pylogabstract -i auth.log`
+   `pylogabstract -i /var/log/auth.log`
 
-6. We can save abstraction results in an output file such as `abstractions-output.log`
+6. We can save abstraction results in an output file such as `auth-output.log`
 
-   `pylogabstract -i auth.log -o auth-output.log`
+   `pylogabstract -i /var/log/auth.log -o auth-output.log`
