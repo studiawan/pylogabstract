@@ -21,6 +21,8 @@ class LogClustering(object):
         self.raw_logs = raw_logs
         self.partial_message_length_group = partial_message_length_group
         self.partial_event_attributes = partial_event_attributes
+
+        # we only have 4GB computer, so we limit the computation.
         self.__BOTTOM_DENSITY = 0.8
         self.__TOP_DENSITY = 1.0
         self.__MAX_EDGES = 10000
@@ -165,6 +167,7 @@ class LogClustering(object):
                 graph_density = nx.density(graph)
 
                 # high density graph
+                # we only have 4GB computer, so we limit the computation.
                 if (self.__BOTTOM_DENSITY < graph_density <= self.__TOP_DENSITY) and \
                         (len(graph.edges) >= self.__MAX_EDGES):
                     force_clustering = ForceClustering(graph, self.cluster_id)
