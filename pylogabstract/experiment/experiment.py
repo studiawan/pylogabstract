@@ -290,7 +290,7 @@ class Experiment(object):
 
 
 if __name__ == '__main__':
-    abstraction_list = ['pylogabstract', 'iplom', 'logsig']
+    abstraction_list = ['pylogabstract', 'iplom', 'logsig', 'spell', 'logmine', 'drain']
     dataset_list = ['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal',
                     'dfrws-2016', 'honeynet-challenge7']
 
