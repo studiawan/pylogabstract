@@ -4,7 +4,7 @@ from pylogabstract.output.output import Output
 
 
 def main():
-    parser = OptionParser(usage='usage: pylogabstract [options] or pylogabstraction.py [options]')
+    parser = OptionParser(usage='usage: pylogabstract [options]')
     parser.add_option('-i', '--input',
                       action='store',
                       dest='input_file',
@@ -34,7 +34,7 @@ def main():
                 print('#' + str(abstraction_id) + ' ' + abstraction['abstraction'])
 
     else:
-        print('Please see help: pylogabstract -h or pylogabstraction.py -h')
+        print('Please see help: pylogabstract -h')
 
 
 if __name__ == "__main__":
