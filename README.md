@@ -1,5 +1,5 @@
 # pylogabstract
-This is accompanying code for a paper entitled "Automatic event log abstraction to support forensic investigation" submitted to DSN conference 2019. We name the proposed method as `pylogabstract`.  
+This is accompanying code for a paper entitled "Automatic event log abstraction to support forensic investigation" submitted to IEEE TrustCom conference 2019. We name the proposed method as `pylogabstract`.
 
 ## Requirements
 1. Python 3.5
@@ -12,13 +12,13 @@ To run the `pylogabstract` tool, please follow these steps.
 
 1. Clone the repository
 
-   `git clone https://github.com/logforensicator/pylogabstract.git`
+   `git clone https://github.com/studiawan/pylogabstract.git`
 
 2. Change directory to `pylogabstract`
 
    `cd pylogabstract`
 
-3. Make sure you have a `pipenv` installed and then run its shell
+3. Make sure you have a `pipenv` installed and then run its shell on directory `pylogabstract`
 
     `pipenv shell`
 
@@ -33,3 +33,27 @@ To run the `pylogabstract` tool, please follow these steps.
 6. We can save abstraction results in an output file such as `auth-output.log`
 
    `pylogabstract -i /var/log/auth.log -o auth-output.log`
+
+## Reproduce results from the paper
+
+There are two scripts to run for reproducing results from the paper. First, we need to build ground truth. Second, we have to run the experiments. 
+
+### (Optional) Build the ground truth. 
+
+This is an optional step as we have included the ground truth in the `datasets` directory. However, if you want to build the ground truth by your own, follow these steps. 
+
+1. Change some values in `datasets.conf` specifically `base_dir`, `perabstraction_dir`, `lineid_abstractionid_dir`, and `abstraction_withid_dir` based on your own directory structure in your computer
+
+2. In the project root directory, run script `groundtruth.py` followed by dataset name. The dataset names supported are `['casper-rw', 'dfrws-2009-jhuisi', 'dfrws-2009-nssal','dfrws-2016', 'honeynet-challenge7']`. For example:
+
+   `python pylogabstract/groundtruth/groundtruth.py casper-rw`
+
+### Run the experiments
+
+To run the experiments, follow these steps. 
+
+1. Change some values in `abstraction.conf` specifically `dataset_path` and `result_path` based on your own directory structure in your computer
+
+2. Run script `experiment.py` followed by method name and dataset name in the project root directory. For example:
+
+   `python pylogabstract/experiment/experiment.py pylogabstract casper-rw`
