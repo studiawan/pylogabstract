@@ -2,8 +2,7 @@ __pycache__/
 .idea
 *.egg-info/
 *.pyc
-pylogabstract/parser/data/*
-pylogabstract/parser/results/*
 results
 datasets/*
 !datasets/README.md
+!pylogabstract/parser/results/
