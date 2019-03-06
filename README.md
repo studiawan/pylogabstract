@@ -34,6 +34,10 @@ To run the `pylogabstract` tool, please follow these steps.
 
    `pylogabstract -i /var/log/auth.log -o auth-output.log`
 
+## Download the datasets
+
+Please follow the instructions in [datasets/README.md](https://github.com/studiawan/pylogabstract/tree/master/datasets) to download and copy the datasets to the proper directory.
+
 ## Reproduce results from the paper
 
 There are two scripts to run for reproducing results from the paper. First, we need to build ground truth. Second, we have to run the experiments. 
