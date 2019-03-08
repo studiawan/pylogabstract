@@ -22,15 +22,25 @@ To run the `pylogabstract` tool, please follow these steps.
 
     `pipenv shell`
 
-4. Install `pylogabstract`
+4. If you are unable to use `pipenv`, create virtual environment using anaconda:
+
+    `conda create --name pylogabstract python=3.5`
+    
+   and then activate it:
+    
+    `conda activate pylogabstract`
+   
+   If you do not have anaconda, use any other tools to create virtual environment. We highly recommend to install `pylogabstract` on a virtual environment.
+
+5. Install `pylogabstract`
 
    `pip install -e .`
 
-5. Run `pylogabstract` to get abstractions from a log file such as `auth.log`
+6. Run `pylogabstract` to get abstractions from a log file such as `auth.log`
 
    `pylogabstract -i /var/log/auth.log`
 
-6. We can save abstraction results in an output file such as `auth-output.log`
+7. We can save abstraction results in an output file such as `auth-output.log`
 
    `pylogabstract -i /var/log/auth.log -o auth-output.log`
 
