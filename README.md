@@ -1,5 +1,5 @@
 # pylogabstract
-This is accompanying code for a paper entitled "Automatic event log abstraction to support forensic investigation" submitted to IEEE TrustCom conference 2019. We name the proposed method as `pylogabstract`.
+This is accompanying code for a paper entitled "Automatic event log abstraction to support forensic investigation". We name the proposed method as `pylogabstract`.
 
 ## Requirements
 1. Python 3.5
